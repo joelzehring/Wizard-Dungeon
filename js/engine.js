@@ -168,7 +168,14 @@ class Game {
                         level.boss.alive = false;
                         createBurst(this.particles, level.boss.x + 32, level.boss.y + 45, "#ef4444", 50);
                         createBurst(this.particles, level.boss.x + 32, level.boss.y + 45, "#fbbf24", 50);
-                        setTimeout(() => { this.gameWon = true; }, 1000);
+                        
+                        setTimeout(() => {
+                            if (this.currentLevelIndex < levelData.length - 1) {
+                                this.loadLevel(this.currentLevelIndex + 1);
+                            } else {
+                                this.gameWon = true;
+                            }
+                        }, 1000);
                     }
                 }
             });
