@@ -628,7 +628,7 @@ function draw() {
             if (!e.alive) return;
             ctx.save(); ctx.translate(e.x, e.y);
             ctx.fillStyle = "#1e1b4b"; ctx.fillRect(0, 8, e.width, e.height - 8);
-            ctx.fillStyle = "#311042"; ctx.fillRect(2, 0, e.width - 4, 10);
+            ctx.fillStyle = "#44165c"; ctx.fillRect(2, 0, e.width - 4, 10);
             ctx.fillStyle = "#f87171";
             if (e.speed > 0) { ctx.fillRect(e.width - 7, 4, 3, 3); ctx.fillRect(e.width - 12, 4, 3, 3); } 
             else { ctx.fillRect(4, 4, 3, 3); ctx.fillRect(9, 4, 3, 3); }
