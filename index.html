@@ -467,7 +467,7 @@ function processInteractions() {
                 if (checkAABBCollision(spell, enemy)) {
                     enemy.alive = false;
                     spells.splice(sIdx, 1);
-                    createBurst(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#ef4444", 16);
+                    createBurst(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#f28602", 16);
                 }
             });
         });
