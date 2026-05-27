@@ -19,7 +19,8 @@ export class Level {
         this.powerUps = (data.powerUps || []).map(p => new PowerUp(p.x, p.y, p.type));
         
         if (this.isBossLevel) {
-            this.boss = new Boss({ x: 750, y: 220, maxHp: 10 });
+            const isFinalBoss = data.name && (data.name.includes("Gorgon") || data.name.includes("World 2"));
+            this.boss = new Boss({ x: 750, y: 220, maxHp: isFinalBoss ? 15 : 10, isFinal: isFinalBoss });
         } else {
             this.boss = null;
         }

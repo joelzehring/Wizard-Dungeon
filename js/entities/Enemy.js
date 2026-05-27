@@ -76,6 +76,7 @@ export class Boss extends Enemy {
         this.shootCooldown = 0;
         this.hoverTime = 0;
         this.basePosition = config.y;
+        this.isFinal = config.isFinal || false;
     }
 
     update(projectiles) {
@@ -106,15 +107,58 @@ export class Boss extends Enemy {
         ctx.fillStyle = "#450a0a"; ctx.fillRect(-10, -20, 84, 8);
         ctx.fillStyle = "#ef4444"; ctx.fillRect(-10, -20, 84 * (this.hp / this.maxHp), 8);
         
-        // Enemy Body Parts
-        ctx.fillStyle = "#111827"; ctx.fillRect(0, 20, this.width, this.height - 20); // Cloak
-        ctx.fillStyle = "#065f46"; ctx.fillRect(12, 0, this.width - 24, 25); // Daemon Head
-        
-        // Glowing Eyes
-        let eyePulse = Math.sin(Date.now() * 0.02) * 2;
-        ctx.fillStyle = "#fbbf24";
-        ctx.beginPath(); ctx.arc(22, 10, 4 + eyePulse / 2, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(42, 10, 4 + eyePulse / 2, 0, Math.PI * 2); ctx.fill();
+        if (this.isFinal) {
+            // Gorgon Boss Visuals (Crimson Cloak with Gold Trim, Stony Head, writhing green snakes, red eyes)
+            
+            // Writhing Snake Hair (drawn in a layer behind/above head)
+            ctx.strokeStyle = "#10b981"; // Emerald
+            ctx.lineWidth = 4.5;
+            let time = Date.now() * 0.003;
+            for (let i = 0; i < 5; i++) {
+                let angleOffset = (i - 2) * 0.45;
+                let wave = Math.sin(time + i * 1.5) * 8;
+                
+                ctx.beginPath();
+                ctx.moveTo(32 + angleOffset * 10, 10);
+                ctx.quadraticCurveTo(
+                    32 + angleOffset * 25 + wave, -15 - i * 3,
+                    32 + angleOffset * 35 + wave * 1.2, -22
+                );
+                ctx.stroke();
+                
+                // Snake head / glowing tip
+                ctx.fillStyle = "#34d399";
+                ctx.beginPath();
+                ctx.arc(32 + angleOffset * 35 + wave * 1.2, -22, 4.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Crimson Cloak
+            ctx.fillStyle = "#7f1d1d"; ctx.fillRect(0, 20, this.width, this.height - 20); 
+            
+            // Gold Trims on Cloak
+            ctx.fillStyle = "#f59e0b"; ctx.fillRect(0, 20, 5, this.height - 20); 
+            ctx.fillStyle = "#f59e0b"; ctx.fillRect(this.width - 5, 20, 5, this.height - 20); 
+            
+            // Stony Gray head
+            ctx.fillStyle = "#475569"; ctx.fillRect(12, 0, this.width - 24, 25);
+            
+            // Piercing Glowing Red Eyes
+            let eyePulse = Math.sin(Date.now() * 0.025) * 2;
+            ctx.fillStyle = "#f43f5e";
+            ctx.beginPath(); ctx.arc(22, 10, 4.5 + eyePulse / 2, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(42, 10, 4.5 + eyePulse / 2, 0, Math.PI * 2); ctx.fill();
+        } else {
+            // Original Gatekeeper Boss
+            ctx.fillStyle = "#111827"; ctx.fillRect(0, 20, this.width, this.height - 20); // Cloak
+            ctx.fillStyle = "#065f46"; ctx.fillRect(12, 0, this.width - 24, 25); // Daemon Head
+            
+            // Glowing Eyes
+            let eyePulse = Math.sin(Date.now() * 0.02) * 2;
+            ctx.fillStyle = "#fbbf24";
+            ctx.beginPath(); ctx.arc(22, 10, 4 + eyePulse / 2, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(42, 10, 4 + eyePulse / 2, 0, Math.PI * 2); ctx.fill();
+        }
         ctx.restore();
     }
 }
