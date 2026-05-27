@@ -14,6 +14,7 @@ export class Player {
         this.hasDoubleJump = false;
         this.canDoubleJump = false;
         this.hasHaste = false;
+        this.invincible = false;
     }
 
     reset() {
@@ -26,6 +27,7 @@ export class Player {
         this.cooldown = false;
         this.speed = this.baseSpeed || 4.5;
         this.canDoubleJump = false;
+        this.invincible = false;
     }
 
     update(inputs, platforms, castSpell) {
@@ -84,6 +86,9 @@ export class Player {
     }
 
     draw(ctx) {
+        if (this.invincible && Math.floor(Date.now() / 100) % 2 === 0) {
+            return;
+        }
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.fillStyle = this.color;

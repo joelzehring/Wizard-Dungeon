@@ -10,11 +10,21 @@ class Game {
         this.scoreDisplay = document.getElementById("scoreDisplay");
         this.levelDisplay = document.getElementById("levelDisplay");
         this.objectiveDisplay = document.getElementById("objectiveDisplay");
+        this.livesDisplay = document.getElementById("livesDisplay");
 
         this.currentLevelIndex = 0;
         this.score = 0;
+        this.lives = 3;
         this.gameOver = false;
         this.gameWon = false;
+        this.inTitleScreen = true;
+
+        // Hide header UI during Title Screen
+        this.levelDisplay.style.opacity = "0";
+        this.objectiveDisplay.style.opacity = "0";
+        const livesCont = document.getElementById("livesContainer");
+        if (livesCont) livesCont.style.opacity = "0";
+
         this.camera = { x: 0, width: this.canvas.width, height: this.canvas.height };
         this.inputs = { left: false, right: false, jump: false, magic: false };
 
@@ -25,14 +35,28 @@ class Game {
         this.enemyProjectiles = [];
 
         this.initInputs();
-        this.loadLevel(0);
         this.loop();
+    }
+
+    startGame() {
+        this.inTitleScreen = false;
+        this.levelDisplay.style.opacity = "1";
+        this.objectiveDisplay.style.opacity = "1";
+        const livesCont = document.getElementById("livesContainer");
+        if (livesCont) livesCont.style.opacity = "1";
+        
+        this.particles = [];
+        this.loadLevel(0);
     }
 
     initInputs() {
         window.addEventListener("keydown", e => {
             if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "KeyW", "KeyA", "KeyS", "KeyD"].includes(e.code)) {
                 e.preventDefault();
+            }
+            if (this.inTitleScreen) {
+                this.startGame();
+                return;
             }
             if (e.code === "ArrowRight" || e.code === "KeyD") this.inputs.right = true;
             if (e.code === "ArrowLeft" || e.code === "KeyA") this.inputs.left = true;
@@ -41,6 +65,7 @@ class Game {
         });
 
         window.addEventListener("keyup", e => {
+            if (this.inTitleScreen) return;
             if (e.code === "ArrowRight" || e.code === "KeyD") this.inputs.right = false;
             if (e.code === "ArrowLeft" || e.code === "KeyA") this.inputs.left = false;
             if (e.code === "ArrowUp" || e.code === "KeyW") this.inputs.jump = false;
@@ -59,24 +84,34 @@ class Game {
 
             btn.addEventListener('pointerdown', (e) => {
                 e.preventDefault();
+                if (this.inTitleScreen) {
+                    this.startGame();
+                    return;
+                }
                 this.inputs[inputAction] = true;
                 btn.setPointerCapture(e.pointerId);
             }, { passive: false });
 
             btn.addEventListener('pointerup', (e) => {
                 e.preventDefault();
+                if (this.inTitleScreen) return;
                 this.inputs[inputAction] = false;
                 try { btn.releasePointerCapture(e.pointerId); } catch(err) {}
             }, { passive: false });
 
             btn.addEventListener('pointercancel', (e) => {
                 e.preventDefault();
+                if (this.inTitleScreen) return;
                 this.inputs[inputAction] = false;
                 try { btn.releasePointerCapture(e.pointerId); } catch(err) {}
             }, { passive: false });
         });
 
         this.canvas.addEventListener("click", () => {
+            if (this.inTitleScreen) {
+                this.startGame();
+                return;
+            }
             if (this.gameOver || this.gameWon) {
                 window.location.reload();
             }
@@ -105,6 +140,37 @@ class Game {
         }
         // Re-cache score display after innerHTML update
         this.scoreDisplay = document.getElementById("scoreDisplay");
+        this.updateLivesUI();
+    }
+
+    updateLivesUI() {
+        if (this.livesDisplay) {
+            this.livesDisplay.innerText = "❤️".repeat(Math.max(0, this.lives));
+        }
+    }
+
+    handlePlayerDeath() {
+        this.lives--;
+        this.updateLivesUI();
+
+        // Visual death effect (burst of red particles)
+        createBurst(this.particles, this.player.x + this.player.width / 2, this.player.y + this.player.height / 2, "#ef4444", 30);
+
+        if (this.lives <= 0) {
+            this.gameOver = true;
+        } else {
+            // Respawn player
+            this.player.reset();
+            // Clear current level spells and projectiles to prevent spawn camping
+            this.spells = [];
+            this.enemyProjectiles = [];
+
+            // Give 1.5 seconds of invincibility
+            this.player.invincible = true;
+            setTimeout(() => {
+                this.player.invincible = false;
+            }, 1500);
+        }
     }
 
     castSpell(p) {
@@ -132,7 +198,7 @@ class Game {
 
             level.enemies.forEach(enemy => {
                 if (!enemy.alive) return;
-                if (checkAABBCollision(wizard, enemy)) this.gameOver = true;
+                if (!wizard.invincible && checkAABBCollision(wizard, enemy)) this.handlePlayerDeath();
                 
                 this.spells.forEach((spell, sIdx) => {
                     if (checkAABBCollision(spell, enemy)) {
@@ -151,10 +217,10 @@ class Game {
                 }
             }
         } else if (level.isBossLevel && level.boss.alive) {
-            if (checkAABBCollision(wizard, level.boss)) this.gameOver = true;
+            if (!wizard.invincible && checkAABBCollision(wizard, level.boss)) this.handlePlayerDeath();
 
             this.enemyProjectiles.forEach(proj => {
-                if (checkAABBCollision(wizard, proj)) this.gameOver = true;
+                if (!wizard.invincible && checkAABBCollision(wizard, proj)) this.handlePlayerDeath();
             });
 
             this.spells.forEach((spell, sIdx) => {
@@ -195,10 +261,33 @@ class Game {
             }
         });
 
-        if (wizard.y > this.canvas.height + 100) this.gameOver = true;
+        if (wizard.y > this.canvas.height + 100) this.handlePlayerDeath();
     }
 
     update() {
+        if (this.inTitleScreen) {
+            // Spawn slow-drifting magical background particles
+            if (this.particles.length < 40 && Math.random() > 0.7) {
+                this.particles.push({
+                    x: Math.random() * this.canvas.width,
+                    y: this.canvas.height + 10,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: -Math.random() * 1.0 - 0.5,
+                    radius: Math.random() * 3 + 1.5,
+                    color: Math.random() > 0.5 ? "#8b5cf6" : "#06b6d4",
+                    alpha: Math.random() * 0.5 + 0.3,
+                    decay: Math.random() * 0.005 + 0.002
+                });
+            }
+            // Update drifting particles
+            for (let i = this.particles.length - 1; i >= 0; i--) {
+                let p = this.particles[i];
+                p.x += p.vx; p.y += p.vy; p.alpha -= p.decay;
+                if (p.alpha <= 0 || p.y < -10) this.particles.splice(i, 1);
+            }
+            return;
+        }
+
         if (this.gameOver || this.gameWon) return;
 
         this.player.update(this.inputs, this.activeLevel.platforms, this.castSpell.bind(this));
@@ -248,6 +337,72 @@ class Game {
     }
 
     draw() {
+        if (this.inTitleScreen) {
+            // Draw deep space background gradient
+            const bgGrad = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
+            bgGrad.addColorStop(0, "#0c051a");
+            bgGrad.addColorStop(1, "#1e1b4b");
+            this.ctx.fillStyle = bgGrad;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // Draw drifting background particles
+            this.particles.forEach(p => {
+                this.ctx.fillStyle = p.color;
+                this.ctx.globalAlpha = p.alpha;
+                this.ctx.beginPath();
+                this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.globalAlpha = 1.0;
+            });
+
+            // Title text: WIZARD
+            this.ctx.textAlign = "center";
+            this.ctx.fillStyle = "#8b5cf6";
+            this.ctx.font = "bold 56px 'Georgia', serif";
+            // Add a beautiful neon shadow glow
+            this.ctx.shadowColor = "#a78bfa";
+            this.ctx.shadowBlur = 15;
+            this.ctx.fillText("WIZARD", this.canvas.width / 2, this.canvas.height / 2 - 80);
+            
+            // Title text: DUNGEON
+            this.ctx.fillStyle = "#06b6d4";
+            this.ctx.shadowColor = "#22d3ee";
+            this.ctx.shadowBlur = 15;
+            this.ctx.fillText("DUNGEON", this.canvas.width / 2, this.canvas.height / 2 - 20);
+            
+            // Reset shadow
+            this.ctx.shadowBlur = 0;
+
+            // Decorative gold lines under the title
+            this.ctx.fillStyle = "#fbbf24";
+            this.ctx.fillRect(this.canvas.width / 2 - 100, this.canvas.height / 2 + 5, 200, 3);
+            
+            // Pulsing "Press SPACE to start" text
+            let pulse = Math.abs(Math.sin(Date.now() * 0.003));
+            this.ctx.fillStyle = `rgba(244, 63, 94, ${0.4 + pulse * 0.6})`; // Pulsing pink-rose
+            this.ctx.font = "bold 18px sans-serif";
+            this.ctx.fillText("PRESS SPACE OR TAP TO ENTER", this.canvas.width / 2, this.canvas.height / 2 + 60);
+
+            // Control guidelines card
+            this.ctx.fillStyle = "rgba(139, 92, 246, 0.1)";
+            this.ctx.strokeStyle = "rgba(139, 92, 246, 0.3)";
+            this.ctx.lineWidth = 2;
+            this.ctx.fillRect(this.canvas.width / 2 - 220, this.canvas.height / 2 + 100, 440, 95);
+            this.ctx.strokeRect(this.canvas.width / 2 - 220, this.canvas.height / 2 + 100, 440, 95);
+
+            this.ctx.fillStyle = "#e2e8f0";
+            this.ctx.font = "bold 13px sans-serif";
+            this.ctx.fillText("CONTROLS GUIDE", this.canvas.width / 2, this.canvas.height / 2 + 120);
+            
+            this.ctx.font = "12px sans-serif";
+            this.ctx.fillStyle = "#cbd5e1";
+            this.ctx.fillText("A / D or ⬅️ / ➡️ : MOVE", this.canvas.width / 2, this.canvas.height / 2 + 145);
+            this.ctx.fillText("W or 🔼 : JUMP / DOUBLE JUMP", this.canvas.width / 2, this.canvas.height / 2 + 165);
+            this.ctx.fillText("SPACE or ✨ BUTTON : CAST MAGIC SPELL", this.canvas.width / 2, this.canvas.height / 2 + 185);
+
+            return;
+        }
+
         this.activeLevel.drawEnvironment(this.ctx, this.canvas, this.camera.x, this.score);
 
         this.ctx.save();
