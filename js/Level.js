@@ -19,7 +19,7 @@ export class Level {
         this.powerUps = (data.powerUps || []).map(p => new PowerUp(p.x, p.y, p.type));
         
         if (this.isBossLevel) {
-            this.boss = new Boss({ x: 750, y: 150, maxHp: 10 });
+            this.boss = new Boss({ x: 750, y: 220, maxHp: 10 });
         } else {
             this.boss = null;
         }

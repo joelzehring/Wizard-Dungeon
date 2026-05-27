@@ -82,7 +82,7 @@ export class Boss extends Enemy {
         if (!this.alive) return;
         // Floating hover motion
         this.hoverTime += 0.04;
-        this.y = this.basePosition + Math.sin(this.hoverTime) * 40;
+        this.y = this.basePosition + Math.sin(this.hoverTime) * 50;
 
         // Auto Attack sequence
         this.shootCooldown++;
