@@ -14,7 +14,14 @@ export const levelData = [
             { x: 500, y: 220, width: 150, height: 15 },
             { x: 1000, y: 280, width: 200, height: 15 },
             { x: 1300, y: 200, width: 150, height: 15 },
-            { x: 1750, y: 300, width: 180, height: 15 }
+            { x: 1750, y: 300, width: 180, height: 15 },
+            // Bonus Area platforms (X >= 4000)
+            { x: 4000, y: 400, width: 300, height: 50 },
+            { x: 4380, y: 340, width: 120, height: 15 },
+            { x: 4570, y: 270, width: 120, height: 15 },
+            { x: 4760, y: 200, width: 120, height: 15 },
+            { x: 4980, y: 280, width: 150, height: 15 },
+            { x: 5200, y: 350, width: 200, height: 50 },
         ],
         crystals: [
             { x: 320, y: 250, width: 16, height: 20, collected: false },
@@ -27,7 +34,21 @@ export const levelData = [
         ],
         powerUps: [
             { x: 1000, y: 240, type: 'haste' }
-        ]
+        ],
+        // Bonus Area
+        rift: { x: 1820, y: 260, width: 40, height: 70 },
+        bonusAreaBgGradient: ["#0a0520", "#1a0a3a"],
+        bonusPlatformColor: "#6d28d9",
+        bonusEnemies: [
+            { x: 4050, y: 368, width: 24, height: 32, minX: 4000, maxX: 4280, speed: 2.5, alive: true },
+            { x: 4600, y: 150, width: 32, height: 32, minX: 4500, maxX: 4750, speed: 2, type: 'flying', alive: true },
+        ],
+        bonusCrystals: [
+            { x: 4410, y: 300, width: 16, height: 20, collected: false },
+            { x: 4795, y: 160, width: 16, height: 20, collected: false },
+        ],
+        star: { x: 5265, y: 300, width: 28, height: 28, collected: false },
+        returnPortal: { x: 5370, y: 310, width: 40, height: 70, targetX: 1900, targetY: 310 },
     },
     {
         name: "Realm 2: The Crystal Spires",
@@ -43,7 +64,14 @@ export const levelData = [
             { x: 1250, y: 350, width: 400, height: 50 },
             { x: 1750, y: 250, width: 200, height: 20 },
             { x: 2000, y: 180, width: 200, height: 20 },
-            { x: 1200, y: 180, width: 300, height: 15 }
+            { x: 1200, y: 180, width: 300, height: 15 },
+            // Bonus Area
+            { x: 4000, y: 400, width: 250, height: 50 },
+            { x: 4320, y: 310, width: 100, height: 15 },
+            { x: 4500, y: 230, width: 100, height: 15 },
+            { x: 4680, y: 310, width: 100, height: 15 },
+            { x: 4860, y: 220, width: 120, height: 15 },
+            { x: 5050, y: 300, width: 200, height: 50 },
         ],
         crystals: [
             { x: 620, y: 270, width: 16, height: 20, collected: false },
@@ -59,7 +87,22 @@ export const levelData = [
         ],
         powerUps: [
             { x: 1250, y: 310, type: 'doubleJump' }
-        ]
+        ],
+        // Bonus Area
+        rift: { x: 2050, y: 140, width: 40, height: 70 },
+        bonusAreaBgGradient: ["#011828", "#02303d"],
+        bonusPlatformColor: "#0891b2",
+        bonusEnemies: [
+            { x: 4100, y: 368, width: 24, height: 32, minX: 4000, maxX: 4230, speed: 2.3, alive: true },
+            { x: 4540, y: 120, width: 32, height: 32, minX: 4420, maxX: 4640, speed: 2.5, type: 'flying', alive: true },
+            { x: 4900, y: 140, width: 32, height: 32, minX: 4790, maxX: 4970, speed: 2.8, type: 'flying', alive: true },
+        ],
+        bonusCrystals: [
+            { x: 4350, y: 270, width: 16, height: 20, collected: false },
+            { x: 4890, y: 180, width: 16, height: 20, collected: false },
+        ],
+        star: { x: 5115, y: 250, width: 28, height: 28, collected: false },
+        returnPortal: { x: 5220, y: 310, width: 40, height: 70, targetX: 2000, targetY: 140 },
     },
     {
         name: "Realm 3: The Sunken Ruins",
@@ -79,7 +122,14 @@ export const levelData = [
             { x: 1100, y: 300, width: 150, height: 15 },
             { x: 1320, y: 250, width: 150, height: 15 },
             { x: 1600, y: 200, width: 200, height: 15 },
-            { x: 1900, y: 280, width: 150, height: 15 }
+            { x: 1900, y: 280, width: 150, height: 15 },
+            // Bonus Area
+            { x: 4000, y: 400, width: 350, height: 50 },
+            { x: 4420, y: 330, width: 100, height: 15 },
+            { x: 4590, y: 250, width: 140, height: 15 },
+            { x: 4800, y: 330, width: 100, height: 15 },
+            { x: 4970, y: 240, width: 120, height: 15 },
+            { x: 5160, y: 360, width: 220, height: 50 },
         ],
         crystals: [
             { x: 270, y: 250, width: 16, height: 20, collected: false },
@@ -94,7 +144,22 @@ export const levelData = [
         ],
         powerUps: [
             { x: 1150, y: 260, type: 'haste' }
-        ]
+        ],
+        // Bonus Area
+        rift: { x: 1960, y: 240, width: 40, height: 70 },
+        bonusAreaBgGradient: ["#011a10", "#023d24"],
+        bonusPlatformColor: "#0d9488",
+        bonusEnemies: [
+            { x: 4080, y: 368, width: 24, height: 32, minX: 4000, maxX: 4340, speed: 2.2, alive: true },
+            { x: 4620, y: 160, width: 32, height: 32, minX: 4520, maxX: 4720, speed: 2.6, type: 'flying', alive: true },
+            { x: 4840, y: 280, width: 24, height: 32, minX: 4800, maxX: 5050, speed: 2.8, alive: true },
+        ],
+        bonusCrystals: [
+            { x: 4445, y: 290, width: 16, height: 20, collected: false },
+            { x: 5000, y: 200, width: 16, height: 20, collected: false },
+        ],
+        star: { x: 5235, y: 310, width: 28, height: 28, collected: false },
+        returnPortal: { x: 5340, y: 320, width: 40, height: 70, targetX: 2050, targetY: 310 },
     },
     {
         name: "World 1 Boss: The Gatekeeper",
@@ -126,7 +191,15 @@ export const levelData = [
             { x: 1350, y: 250, width: 200, height: 15 },
             { x: 1700, y: 280, width: 150, height: 15 },
             { x: 1950, y: 200, width: 150, height: 15 },
-            { x: 2150, y: 400, width: 300, height: 50 }
+            { x: 2150, y: 400, width: 300, height: 50 },
+            // Bonus Area
+            { x: 4000, y: 400, width: 280, height: 50 },
+            { x: 4350, y: 320, width: 100, height: 15 },
+            { x: 4520, y: 240, width: 100, height: 15 },
+            { x: 4700, y: 160, width: 120, height: 15 },
+            { x: 4900, y: 240, width: 100, height: 15 },
+            { x: 5080, y: 320, width: 100, height: 15 },
+            { x: 5260, y: 380, width: 220, height: 50 },
         ],
         crystals: [
             { x: 640, y: 250, width: 16, height: 20, collected: false },
@@ -142,7 +215,22 @@ export const levelData = [
             { x: 800, y: 100, width: 32, height: 32, minX: 600, maxX: 1000, speed: 2.5, type: 'flying', alive: true },
             { x: 1700, y: 150, width: 32, height: 32, minX: 1500, maxX: 1900, speed: 3, type: 'flying', alive: true }
         ],
-        powerUps: []
+        powerUps: [],
+        // Bonus Area
+        rift: { x: 2210, y: 350, width: 40, height: 70 },
+        bonusAreaBgGradient: ["#12022a", "#240341"],
+        bonusPlatformColor: "#86198f",
+        bonusEnemies: [
+            { x: 4050, y: 368, width: 24, height: 32, minX: 4000, maxX: 4260, speed: 2.8, alive: true },
+            { x: 4580, y: 140, width: 32, height: 32, minX: 4450, maxX: 4670, speed: 3.0, type: 'flying', alive: true },
+            { x: 4940, y: 150, width: 32, height: 32, minX: 4840, maxX: 5040, speed: 3.2, type: 'flying', alive: true },
+        ],
+        bonusCrystals: [
+            { x: 4380, y: 280, width: 16, height: 20, collected: false },
+            { x: 4730, y: 120, width: 16, height: 20, collected: false },
+        ],
+        star: { x: 5340, y: 330, width: 28, height: 28, collected: false },
+        returnPortal: { x: 5445, y: 340, width: 40, height: 70, targetX: 2100, targetY: 320 },
     },
     {
         name: "Realm 5: The Frozen Peaks",
@@ -163,7 +251,15 @@ export const levelData = [
             { x: 1150, y: 210, width: 150, height: 15 },
             { x: 1400, y: 290, width: 150, height: 15 },
             { x: 1650, y: 200, width: 180, height: 15 },
-            { x: 1950, y: 280, width: 150, height: 15 }
+            { x: 1950, y: 280, width: 150, height: 15 },
+            // Bonus Area
+            { x: 4000, y: 400, width: 350, height: 50 },
+            { x: 4420, y: 330, width: 80, height: 15 },
+            { x: 4580, y: 250, width: 80, height: 15 },
+            { x: 4740, y: 170, width: 80, height: 15 },
+            { x: 4900, y: 250, width: 80, height: 15 },
+            { x: 5060, y: 330, width: 80, height: 15 },
+            { x: 5220, y: 380, width: 200, height: 50 },
         ],
         crystals: [
             { x: 200, y: 240, width: 16, height: 20, collected: false },
@@ -180,7 +276,22 @@ export const levelData = [
         ],
         powerUps: [
             { x: 1650, y: 160, type: 'haste' }
-        ]
+        ],
+        // Bonus Area
+        rift: { x: 2010, y: 240, width: 40, height: 70 },
+        bonusAreaBgGradient: ["#080e1f", "#0f2060"],
+        bonusPlatformColor: "#0ea5e9",
+        bonusEnemies: [
+            { x: 4060, y: 368, width: 24, height: 32, minX: 4000, maxX: 4330, speed: 2.6, alive: true },
+            { x: 4660, y: 140, width: 32, height: 32, minX: 4510, maxX: 4700, speed: 3.0, type: 'flying', alive: true },
+            { x: 5000, y: 200, width: 24, height: 32, minX: 4910, maxX: 5130, speed: 3.2, alive: true },
+        ],
+        bonusCrystals: [
+            { x: 4450, y: 290, width: 16, height: 20, collected: false },
+            { x: 4770, y: 130, width: 16, height: 20, collected: false },
+        ],
+        star: { x: 5295, y: 330, width: 28, height: 28, collected: false },
+        returnPortal: { x: 5400, y: 340, width: 40, height: 70, targetX: 2100, targetY: 310 },
     },
     {
         name: "Realm 6: The Volcanic Core",
@@ -202,7 +313,15 @@ export const levelData = [
             { x: 1400, y: 220, width: 120, height: 15 },
             { x: 1650, y: 290, width: 150, height: 15 },
             { x: 1850, y: 200, width: 150, height: 15 },
-            { x: 2100, y: 280, width: 150, height: 15 }
+            { x: 2100, y: 280, width: 150, height: 15 },
+            // Bonus Area
+            { x: 4000, y: 400, width: 300, height: 50 },
+            { x: 4370, y: 340, width: 100, height: 15 },
+            { x: 4540, y: 260, width: 120, height: 15 },
+            { x: 4730, y: 180, width: 100, height: 15 },
+            { x: 4900, y: 260, width: 120, height: 15 },
+            { x: 5090, y: 340, width: 100, height: 15 },
+            { x: 5280, y: 380, width: 220, height: 50 },
         ],
         crystals: [
             { x: 250, y: 250, width: 16, height: 20, collected: false },
@@ -220,7 +339,23 @@ export const levelData = [
         ],
         powerUps: [
             { x: 1250, y: 260, type: 'haste' }
-        ]
+        ],
+        // Bonus Area
+        rift: { x: 2160, y: 240, width: 40, height: 70 },
+        bonusAreaBgGradient: ["#150303", "#2e0508"],
+        bonusPlatformColor: "#c2410c",
+        bonusEnemies: [
+            { x: 4060, y: 368, width: 24, height: 32, minX: 4000, maxX: 4280, speed: 3.0, alive: true },
+            { x: 4600, y: 150, width: 32, height: 32, minX: 4480, maxX: 4700, speed: 3.2, type: 'flying', alive: true },
+            { x: 4950, y: 170, width: 32, height: 32, minX: 4840, maxX: 5050, speed: 3.5, type: 'flying', alive: true },
+            { x: 5140, y: 300, width: 24, height: 32, minX: 5090, maxX: 5260, speed: 3.2, alive: true },
+        ],
+        bonusCrystals: [
+            { x: 4400, y: 300, width: 16, height: 20, collected: false },
+            { x: 4760, y: 140, width: 16, height: 20, collected: false },
+        ],
+        star: { x: 5355, y: 330, width: 28, height: 28, collected: false },
+        returnPortal: { x: 5470, y: 340, width: 40, height: 70, targetX: 2200, targetY: 310 },
     },
     {
         name: "World 2 Boss: Gorgon's Lair",

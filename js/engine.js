@@ -11,19 +11,34 @@ class Game {
         this.levelDisplay = document.getElementById("levelDisplay");
         this.objectiveDisplay = document.getElementById("objectiveDisplay");
         this.livesDisplay = document.getElementById("livesDisplay");
+        this.starsDisplay = document.getElementById("starsDisplay");
 
         this.currentLevelIndex = 0;
         this.score = 0;
         this.lives = 3;
+        this.totalStars = 0;
+        this.maxStars = 6;
         this.gameOver = false;
         this.gameWon = false;
         this.inTitleScreen = true;
+
+        // Flash effect state
+        this.flashAlpha = 0;
+        this.flashColor = "#ffffff";
+
+        // Discovery banner state
+        this.bannerTimer = 0;
+        this.bannerText = "";
+        this.bannerSubText = "";
+        this.bannerColor = "#fbbf24";
 
         // Hide header UI during Title Screen
         this.levelDisplay.style.opacity = "0";
         this.objectiveDisplay.style.opacity = "0";
         const livesCont = document.getElementById("livesContainer");
         if (livesCont) livesCont.style.opacity = "0";
+        const starsCont = document.getElementById("starsContainer");
+        if (starsCont) starsCont.style.opacity = "0";
 
         this.camera = { x: 0, width: this.canvas.width, height: this.canvas.height };
         this.inputs = { left: false, right: false, jump: false, magic: false };
@@ -44,7 +59,9 @@ class Game {
         this.objectiveDisplay.style.opacity = "1";
         const livesCont = document.getElementById("livesContainer");
         if (livesCont) livesCont.style.opacity = "1";
-        
+        const starsCont = document.getElementById("starsContainer");
+        if (starsCont) starsCont.style.opacity = "1";
+
         this.particles = [];
         this.loadLevel(0);
     }
@@ -126,7 +143,7 @@ class Game {
         this.currentLevelIndex = index;
         this.activeLevel = new Level(levelData[this.currentLevelIndex]);
         this.score = 0;
-        
+
         this.player.reset();
         this.spells = [];
         this.particles = [];
@@ -141,11 +158,18 @@ class Game {
         // Re-cache score display after innerHTML update
         this.scoreDisplay = document.getElementById("scoreDisplay");
         this.updateLivesUI();
+        this.updateStarsUI();
     }
 
     updateLivesUI() {
         if (this.livesDisplay) {
             this.livesDisplay.innerText = "❤️".repeat(Math.max(0, this.lives));
+        }
+    }
+
+    updateStarsUI() {
+        if (this.starsDisplay) {
+            this.starsDisplay.innerText = `${this.totalStars}/${this.maxStars}`;
         }
     }
 
@@ -182,6 +206,18 @@ class Game {
         });
     }
 
+    triggerFlash(color, strength = 0.7) {
+        this.flashColor = color;
+        this.flashAlpha = strength;
+    }
+
+    showBanner(text, subText, color = "#fbbf24", duration = 180) {
+        this.bannerText = text;
+        this.bannerSubText = subText;
+        this.bannerColor = color;
+        this.bannerTimer = duration;
+    }
+
     processInteractions() {
         const wizard = this.player;
         const level = this.activeLevel;
@@ -196,10 +232,82 @@ class Game {
                 }
             });
 
+            // Bonus crystals (golden)
+            level.bonusCrystals.forEach(crystal => {
+                if (!crystal.collected && checkAABBCollision(wizard, crystal)) {
+                    crystal.collected = true;
+                    createBurst(this.particles, crystal.x + 8, crystal.y + 10, "#fbbf24", 12);
+                    this.triggerFlash("#fbbf24", 0.25);
+                }
+            });
+
+            // Secret Rift — teleport to bonus area
+            if (level.rift && !level.rift.entered) {
+                const riftRect = { x: level.rift.x, y: level.rift.y, width: level.rift.width, height: level.rift.height };
+                if (checkAABBCollision(wizard, riftRect)) {
+                    level.rift.entered = true;
+                    wizard.x = level.rift.targetX || 4050;
+                    wizard.y = level.rift.targetY || 300;
+                    wizard.vx = 0; wizard.vy = 0;
+                    this.triggerFlash("#d946ef", 0.8);
+                    createBurst(this.particles, wizard.x + wizard.width / 2, wizard.y + wizard.height / 2, "#d946ef", 40);
+                    this.showBanner("SECRET BONUS AREA!", "Collect the Golden Star!", "#d946ef");
+                }
+            }
+
+            // Return Portal — teleport back near main portal
+            if (level.returnPortal) {
+                const rpRect = { x: level.returnPortal.x, y: level.returnPortal.y, width: level.returnPortal.width, height: level.returnPortal.height };
+                if (checkAABBCollision(wizard, rpRect)) {
+                    wizard.x = level.returnPortal.targetX || (level.portalX - 100);
+                    wizard.y = level.returnPortal.targetY || level.portalY;
+                    wizard.vx = 0; wizard.vy = 0;
+                    this.triggerFlash("#10b981", 0.7);
+                    createBurst(this.particles, wizard.x + wizard.width / 2, wizard.y + wizard.height / 2, "#10b981", 30);
+                    this.showBanner("RETURNED!", "Find all 6 stars!", "#10b981", 90);
+                }
+            }
+
+            // Golden Star collection
+            if (level.star && !level.star.collected) {
+                const starRect = { x: level.star.x, y: level.star.y, width: level.star.width, height: level.star.height };
+                if (checkAABBCollision(wizard, starRect)) {
+                    level.star.collected = true;
+                    this.totalStars++;
+                    this.updateStarsUI();
+                    // Bonus life (up to 5)
+                    if (this.lives < 5) {
+                        this.lives++;
+                        this.updateLivesUI();
+                    }
+                    // Big golden explosion
+                    createBurst(this.particles, starRect.x + starRect.width / 2, starRect.y + starRect.height / 2, "#fbbf24", 60);
+                    createBurst(this.particles, starRect.x + starRect.width / 2, starRect.y + starRect.height / 2, "#fef08a", 40);
+                    createBurst(this.particles, starRect.x + starRect.width / 2, starRect.y + starRect.height / 2, "#f59e0b", 25);
+                    this.triggerFlash("#fef08a", 0.9);
+                    this.showBanner("✨ ANCIENT STAR DISCOVERED!", "+1 Extra Life Awarded!", "#fbbf24", 240);
+                }
+            }
+
+            // Normal enemies
             level.enemies.forEach(enemy => {
                 if (!enemy.alive) return;
                 if (!wizard.invincible && checkAABBCollision(wizard, enemy)) this.handlePlayerDeath();
-                
+
+                this.spells.forEach((spell, sIdx) => {
+                    if (checkAABBCollision(spell, enemy)) {
+                        enemy.alive = false;
+                        this.spells.splice(sIdx, 1);
+                        createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#f28602", 16);
+                    }
+                });
+            });
+
+            // Bonus area enemies
+            level.bonusEnemies.forEach(enemy => {
+                if (!enemy.alive) return;
+                if (!wizard.invincible && checkAABBCollision(wizard, enemy)) this.handlePlayerDeath();
+
                 this.spells.forEach((spell, sIdx) => {
                     if (checkAABBCollision(spell, enemy)) {
                         enemy.alive = false;
@@ -229,12 +337,12 @@ class Game {
                     this.spells.splice(sIdx, 1);
                     createBurst(this.particles, level.boss.x + 10, spell.y, "#ff3333", 8);
                     this.scoreDisplay.innerText = level.boss.hp;
-                    
+
                     if (level.boss.hp <= 0) {
                         level.boss.alive = false;
                         createBurst(this.particles, level.boss.x + 32, level.boss.y + 45, "#ef4444", 50);
                         createBurst(this.particles, level.boss.x + 32, level.boss.y + 45, "#fbbf24", 50);
-                        
+
                         setTimeout(() => {
                             if (this.currentLevelIndex < levelData.length - 1) {
                                 this.loadLevel(this.currentLevelIndex + 1);
@@ -251,7 +359,7 @@ class Game {
             if (!p.collected && checkAABBCollision(wizard, p)) {
                 p.collected = true;
                 createBurst(this.particles, p.x + 10, p.y + 10, p.color, 15);
-                
+
                 if (p.type === 'haste') {
                     wizard.hasHaste = true;
                     wizard.speed = wizard.baseSpeed * 1.5;
@@ -294,6 +402,7 @@ class Game {
 
         if (!this.activeLevel.isBossLevel) {
             this.activeLevel.enemies.forEach(e => e.update());
+            this.activeLevel.bonusEnemies.forEach(e => e.update());
         } else if (this.activeLevel.boss.alive) {
             this.activeLevel.boss.update(this.enemyProjectiles);
         }
@@ -302,7 +411,7 @@ class Game {
 
         this.camera.x = this.player.x - this.canvas.width / 2 + this.player.width / 2;
         if (this.camera.x < 0) this.camera.x = 0;
-        if (this.activeLevel.isBossLevel && this.camera.x > 150) this.camera.x = 150; 
+        if (this.activeLevel.isBossLevel && this.camera.x > 150) this.camera.x = 150;
 
         // Update Spells
         for (let i = this.spells.length - 1; i >= 0; i--) {
@@ -334,6 +443,17 @@ class Game {
             let p = this.particles[i]; p.x += p.vx; p.y += p.vy; p.alpha -= p.decay;
             if (p.alpha <= 0) this.particles.splice(i, 1);
         }
+
+        // Decay flash
+        if (this.flashAlpha > 0) {
+            this.flashAlpha -= 0.035;
+            if (this.flashAlpha < 0) this.flashAlpha = 0;
+        }
+
+        // Decay banner
+        if (this.bannerTimer > 0) {
+            this.bannerTimer--;
+        }
     }
 
     draw() {
@@ -359,27 +479,25 @@ class Game {
             this.ctx.textAlign = "center";
             this.ctx.fillStyle = "#8b5cf6";
             this.ctx.font = "bold 56px 'Georgia', serif";
-            // Add a beautiful neon shadow glow
             this.ctx.shadowColor = "#a78bfa";
             this.ctx.shadowBlur = 15;
             this.ctx.fillText("WIZARD", this.canvas.width / 2, this.canvas.height / 2 - 80);
-            
+
             // Title text: DUNGEON
             this.ctx.fillStyle = "#06b6d4";
             this.ctx.shadowColor = "#22d3ee";
             this.ctx.shadowBlur = 15;
             this.ctx.fillText("DUNGEON", this.canvas.width / 2, this.canvas.height / 2 - 20);
-            
-            // Reset shadow
+
             this.ctx.shadowBlur = 0;
 
-            // Decorative gold lines under the title
+            // Decorative gold lines
             this.ctx.fillStyle = "#fbbf24";
             this.ctx.fillRect(this.canvas.width / 2 - 100, this.canvas.height / 2 + 5, 200, 3);
-            
-            // Pulsing "Press SPACE to start" text
+
+            // Pulsing start text
             let pulse = Math.abs(Math.sin(Date.now() * 0.003));
-            this.ctx.fillStyle = `rgba(244, 63, 94, ${0.4 + pulse * 0.6})`; // Pulsing pink-rose
+            this.ctx.fillStyle = `rgba(244, 63, 94, ${0.4 + pulse * 0.6})`;
             this.ctx.font = "bold 18px sans-serif";
             this.ctx.fillText("PRESS SPACE OR TAP TO ENTER", this.canvas.width / 2, this.canvas.height / 2 + 60);
 
@@ -393,7 +511,7 @@ class Game {
             this.ctx.fillStyle = "#e2e8f0";
             this.ctx.font = "bold 13px sans-serif";
             this.ctx.fillText("CONTROLS GUIDE", this.canvas.width / 2, this.canvas.height / 2 + 120);
-            
+
             this.ctx.font = "12px sans-serif";
             this.ctx.fillStyle = "#cbd5e1";
             this.ctx.fillText("A / D or ⬅️ / ➡️ : MOVE", this.canvas.width / 2, this.canvas.height / 2 + 145);
@@ -426,16 +544,72 @@ class Game {
         this.player.draw(this.ctx);
         this.ctx.restore();
 
+        // Screen Flash Overlay
+        if (this.flashAlpha > 0) {
+            this.ctx.save();
+            this.ctx.globalAlpha = this.flashAlpha;
+            this.ctx.fillStyle = this.flashColor;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.globalAlpha = 1;
+            this.ctx.restore();
+        }
+
+        // Discovery Banner
+        if (this.bannerTimer > 0) {
+            const progress = this.bannerTimer / 240;
+            const fadeAlpha = this.bannerTimer < 40 ? this.bannerTimer / 40 : (this.bannerTimer > 200 ? (240 - this.bannerTimer) / 40 : 1);
+            const bannerY = this.canvas.height / 2 - 60 - (1 - Math.min(progress * 3, 1)) * 30;
+
+            this.ctx.save();
+            this.ctx.globalAlpha = fadeAlpha;
+
+            // Banner background
+            this.ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+            this.ctx.strokeStyle = this.bannerColor;
+            this.ctx.lineWidth = 2;
+            const bw = 480, bh = 70;
+            const bx = this.canvas.width / 2 - bw / 2;
+            const by = bannerY - 10;
+            this.ctx.beginPath();
+            this.ctx.roundRect(bx, by, bw, bh, 8);
+            this.ctx.fill();
+            this.ctx.stroke();
+
+            // Banner text
+            this.ctx.textAlign = "center";
+            this.ctx.shadowColor = this.bannerColor;
+            this.ctx.shadowBlur = 12;
+            this.ctx.fillStyle = this.bannerColor;
+            this.ctx.font = "bold 22px sans-serif";
+            this.ctx.fillText(this.bannerText, this.canvas.width / 2, bannerY + 20);
+
+            this.ctx.shadowBlur = 6;
+            this.ctx.fillStyle = "#e2e8f0";
+            this.ctx.font = "14px sans-serif";
+            this.ctx.fillText(this.bannerSubText, this.canvas.width / 2, bannerY + 44);
+
+            this.ctx.shadowBlur = 0;
+            this.ctx.globalAlpha = 1;
+            this.ctx.restore();
+        }
+
         if (this.gameOver || this.gameWon) {
             this.ctx.fillStyle = "rgba(0, 0, 0, 0.85)";
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             this.ctx.fillStyle = this.gameOver ? "#f87171" : "#34d399";
             this.ctx.font = "bold 28px sans-serif";
             this.ctx.textAlign = "center";
-            this.ctx.fillText(this.gameOver ? "GAME OVER" : "ALL REALMS SAVED!", this.canvas.width / 2, this.canvas.height / 2 - 10);
+            this.ctx.fillText(this.gameOver ? "GAME OVER" : "ALL REALMS SAVED!", this.canvas.width / 2, this.canvas.height / 2 - 30);
+
+            if (this.gameWon) {
+                this.ctx.fillStyle = "#fbbf24";
+                this.ctx.font = "bold 18px sans-serif";
+                this.ctx.fillText(`⭐ Ancient Stars Collected: ${this.totalStars}/${this.maxStars}`, this.canvas.width / 2, this.canvas.height / 2 + 5);
+            }
+
             this.ctx.fillStyle = "#a78bfa";
             this.ctx.font = "16px sans-serif";
-            this.ctx.fillText("Click or tap the screen to try again", this.canvas.width / 2, this.canvas.height / 2 + 30);
+            this.ctx.fillText("Click or tap the screen to try again", this.canvas.width / 2, this.canvas.height / 2 + 35);
         }
     }
 
