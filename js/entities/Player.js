@@ -15,6 +15,7 @@ export class Player {
         this.canDoubleJump = false;
         this.hasHaste = false;
         this.invincible = false;
+        this.selectedSpell = 0; // 0=Lightning, 1=Fireball, 2=IceShard, 3=Arcane
     }
 
     reset() {
@@ -51,7 +52,17 @@ export class Player {
         if (inputs.magic && !this.cooldown) {
             castSpell(this);
             this.cooldown = true;
-            setTimeout(() => this.cooldown = false, 300);
+            const cooldownMs = [250, 500, 400, 350][this.selectedSpell] ?? 300;
+            setTimeout(() => this.cooldown = false, cooldownMs);
+        }
+
+        if (inputs.nextSpell) {
+            this.selectedSpell = (this.selectedSpell + 1) % 4;
+            inputs.nextSpell = false;
+        }
+        if (inputs.prevSpell) {
+            this.selectedSpell = (this.selectedSpell + 3) % 4;
+            inputs.prevSpell = false;
         }
 
         this.vy += this.gravity;

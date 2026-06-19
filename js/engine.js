@@ -41,7 +41,13 @@ class Game {
         if (starsCont) starsCont.style.opacity = "0";
 
         this.camera = { x: 0, width: this.canvas.width, height: this.canvas.height };
-        this.inputs = { left: false, right: false, jump: false, magic: false };
+        this.inputs = { left: false, right: false, jump: false, magic: false, nextSpell: false, prevSpell: false };
+        this.SPELL_DEFS = [
+            { name: "Lightning Bolt", icon: "⚡", color: "#facc15", desc: "Fast & piercing" },
+            { name: "Fireball",       icon: "🔥", color: "#f97316", desc: "Slow, explosive" },
+            { name: "Ice Shard",      icon: "❄️",  color: "#67e8f9", desc: "Triple spread" },
+            { name: "Arcane Missile", icon: "💜", color: "#c084fc", desc: "Seeks enemies" },
+        ];
 
         this.player = new Player();
         this.activeLevel = null;
@@ -79,6 +85,8 @@ class Game {
             if (e.code === "ArrowLeft" || e.code === "KeyA") this.inputs.left = true;
             if (e.code === "ArrowUp" || e.code === "KeyW") this.inputs.jump = true;
             if (e.code === "Space") this.inputs.magic = true;
+            if (e.code === "KeyE") this.inputs.nextSpell = true;
+            if (e.code === "KeyQ") this.inputs.prevSpell = true;
         });
 
         window.addEventListener("keyup", e => {
@@ -198,12 +206,53 @@ class Game {
     }
 
     castSpell(p) {
-        this.spells.push({
-            x: p.facing === "right" ? p.x + p.width + 5 : p.x - 15,
-            y: p.y + 20,
-            vx: p.facing === "right" ? 7 : -7,
-            width: 10, height: 10, life: 60
-        });
+        const dir = p.facing === "right" ? 1 : -1;
+        const ox = p.facing === "right" ? p.x + p.width + 5 : p.x - 15;
+        const oy = p.y + 20;
+
+        switch (p.selectedSpell) {
+            case 0: // ⚡ Lightning Bolt — fast, pierces
+                this.spells.push({
+                    type: "lightning", x: ox, y: oy + 2,
+                    vx: dir * 14, vy: 0,
+                    width: 18, height: 6, life: 50,
+                    piercing: true, color: "#facc15"
+                });
+                // trail burst
+                createBurst(this.particles, ox, oy + 5, "#fef08a", 5);
+                break;
+
+            case 1: // 🔥 Fireball — slow, large, explodes
+                this.spells.push({
+                    type: "fireball", x: ox, y: oy - 4,
+                    vx: dir * 4, vy: 0,
+                    width: 20, height: 20, life: 90,
+                    piercing: false, color: "#f97316"
+                });
+                break;
+
+            case 2: // ❄️ Ice Shard — 3-way spread
+                [-0.25, 0, 0.25].forEach(vyOff => {
+                    this.spells.push({
+                        type: "ice", x: ox, y: oy,
+                        vx: dir * 9, vy: vyOff * 6,
+                        width: 12, height: 8, life: 45,
+                        piercing: false, color: "#67e8f9"
+                    });
+                });
+                createBurst(this.particles, ox, oy + 4, "#a5f3fc", 8);
+                break;
+
+            case 3: // 💜 Arcane Missile — homing
+                this.spells.push({
+                    type: "arcane", x: ox, y: oy,
+                    vx: dir * 6, vy: 0,
+                    width: 12, height: 12, life: 80,
+                    piercing: false, color: "#c084fc",
+                    homing: true
+                });
+                break;
+        }
     }
 
     triggerFlash(color, strength = 0.7) {
@@ -294,13 +343,21 @@ class Game {
                 if (!enemy.alive) return;
                 if (!wizard.invincible && checkAABBCollision(wizard, enemy)) this.handlePlayerDeath();
 
-                this.spells.forEach((spell, sIdx) => {
+                for (let sIdx = this.spells.length - 1; sIdx >= 0; sIdx--) {
+                    const spell = this.spells[sIdx];
                     if (checkAABBCollision(spell, enemy)) {
                         enemy.alive = false;
-                        this.spells.splice(sIdx, 1);
-                        createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#f28602", 16);
+                        const burstColor = spell.type === "fireball" ? "#f97316" : spell.type === "ice" ? "#a5f3fc" : spell.type === "arcane" ? "#c084fc" : "#facc15";
+                        if (spell.type === "fireball") {
+                            createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#f97316", 30);
+                            createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#fbbf24", 16);
+                            this.triggerFlash("#f97316", 0.2);
+                        } else {
+                            createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, burstColor, 16);
+                        }
+                        if (!spell.piercing) this.spells.splice(sIdx, 1);
                     }
-                });
+                }
             });
 
             // Bonus area enemies
@@ -308,13 +365,20 @@ class Game {
                 if (!enemy.alive) return;
                 if (!wizard.invincible && checkAABBCollision(wizard, enemy)) this.handlePlayerDeath();
 
-                this.spells.forEach((spell, sIdx) => {
+                for (let sIdx = this.spells.length - 1; sIdx >= 0; sIdx--) {
+                    const spell = this.spells[sIdx];
                     if (checkAABBCollision(spell, enemy)) {
                         enemy.alive = false;
-                        this.spells.splice(sIdx, 1);
-                        createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#f28602", 16);
+                        const burstColor = spell.type === "fireball" ? "#f97316" : spell.type === "ice" ? "#a5f3fc" : spell.type === "arcane" ? "#c084fc" : "#facc15";
+                        if (spell.type === "fireball") {
+                            createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#f97316", 30);
+                            createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#fbbf24", 16);
+                        } else {
+                            createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, burstColor, 16);
+                        }
+                        if (!spell.piercing) this.spells.splice(sIdx, 1);
                     }
-                });
+                }
             });
 
             if (this.score >= level.crystals.length) {
@@ -331,11 +395,13 @@ class Game {
                 if (!wizard.invincible && checkAABBCollision(wizard, proj)) this.handlePlayerDeath();
             });
 
-            this.spells.forEach((spell, sIdx) => {
+            for (let sIdx = this.spells.length - 1; sIdx >= 0; sIdx--) {
+                const spell = this.spells[sIdx];
                 if (checkAABBCollision(spell, level.boss)) {
                     level.boss.hp--;
-                    this.spells.splice(sIdx, 1);
-                    createBurst(this.particles, level.boss.x + 10, spell.y, "#ff3333", 8);
+                    if (!spell.piercing) this.spells.splice(sIdx, 1);
+                    const burstColor = spell.type === "fireball" ? "#f97316" : spell.type === "ice" ? "#a5f3fc" : spell.type === "arcane" ? "#c084fc" : "#facc15";
+                    createBurst(this.particles, level.boss.x + 10, spell.y, burstColor, 10);
                     this.scoreDisplay.innerText = level.boss.hp;
 
                     if (level.boss.hp <= 0) {
@@ -352,7 +418,7 @@ class Game {
                         }, 1000);
                     }
                 }
-            });
+            }
         }
 
         level.powerUps.forEach(p => {
@@ -415,14 +481,57 @@ class Game {
 
         // Update Spells
         for (let i = this.spells.length - 1; i >= 0; i--) {
-            let s = this.spells[i]; s.x += s.vx; s.life--;
-            if (Math.random() > 0.4) {
+            let s = this.spells[i];
+
+            // Arcane homing: steer toward nearest alive enemy
+            if (s.homing && this.activeLevel) {
+                const allEnemies = [
+                    ...(this.activeLevel.enemies || []),
+                    ...(this.activeLevel.bonusEnemies || []),
+                    ...(this.activeLevel.boss && this.activeLevel.boss.alive ? [this.activeLevel.boss] : [])
+                ].filter(e => e.alive !== false);
+                let nearest = null, nearestDist = Infinity;
+                allEnemies.forEach(e => {
+                    const ex = e.x + (e.width || 0) / 2;
+                    const ey = e.y + (e.height || 0) / 2;
+                    const dist = Math.hypot(ex - s.x, ey - s.y);
+                    if (dist < nearestDist) { nearest = e; nearestDist = dist; }
+                });
+                if (nearest && nearestDist < 350) {
+                    const tx = nearest.x + (nearest.width || 0) / 2;
+                    const ty = nearest.y + (nearest.height || 0) / 2;
+                    const angle = Math.atan2(ty - s.y, tx - s.x);
+                    const spd = Math.hypot(s.vx, s.vy) || 6;
+                    s.vx += (Math.cos(angle) * spd - s.vx) * 0.12;
+                    s.vy += (Math.sin(angle) * spd - s.vy) * 0.12;
+                }
+            }
+
+            s.x += s.vx;
+            s.y += s.vy;
+            s.life--;
+
+            // Spell-type trail particles
+            const trailChance = s.type === "fireball" ? 0.9 : s.type === "lightning" ? 0.6 : 0.5;
+            if (Math.random() < trailChance) {
                 this.particles.push({
-                    x: s.x + 5, y: s.y + 5, vx: (Math.random() - 0.5) * 1, vy: (Math.random() - 0.5) * 1,
-                    radius: Math.random() * 2 + 1, color: "#6ee7b7", alpha: 0.8, decay: 0.04
+                    x: s.x + s.width / 2 + (Math.random() - 0.5) * 4,
+                    y: s.y + s.height / 2 + (Math.random() - 0.5) * 4,
+                    vx: (Math.random() - 0.5) * (s.type === "fireball" ? 2 : 1),
+                    vy: (Math.random() - 0.5) * (s.type === "fireball" ? 2 : 1),
+                    radius: Math.random() * (s.type === "fireball" ? 4 : 2) + 1,
+                    color: s.color, alpha: 0.8, decay: s.type === "fireball" ? 0.03 : 0.05
                 });
             }
-            if (s.life <= 0) this.spells.splice(i, 1);
+
+            if (s.life <= 0) {
+                // Fireball explodes on expiry too
+                if (s.type === "fireball") {
+                    createBurst(this.particles, s.x + 10, s.y + 10, "#f97316", 20);
+                    createBurst(this.particles, s.x + 10, s.y + 10, "#fbbf24", 12);
+                }
+                this.spells.splice(i, 1);
+            }
         }
 
         // Update Enemy Projectiles
@@ -527,8 +636,56 @@ class Game {
         this.ctx.translate(-this.camera.x, 0);
 
         // Spells & Projectiles
-        this.ctx.fillStyle = "#6ee7b7";
-        this.spells.forEach(s => this.ctx.fillRect(s.x, s.y, s.width, s.height));
+        this.spells.forEach(s => {
+            this.ctx.save();
+            this.ctx.shadowColor = s.color;
+            this.ctx.shadowBlur = 12;
+            this.ctx.fillStyle = s.color;
+            if (s.type === "fireball") {
+                // Glowing circle
+                this.ctx.beginPath();
+                this.ctx.arc(s.x + s.width / 2, s.y + s.height / 2, s.width / 2, 0, Math.PI * 2);
+                this.ctx.fill();
+                // Inner bright core
+                this.ctx.fillStyle = "#fef08a";
+                this.ctx.shadowBlur = 0;
+                this.ctx.beginPath();
+                this.ctx.arc(s.x + s.width / 2, s.y + s.height / 2, s.width / 4, 0, Math.PI * 2);
+                this.ctx.fill();
+            } else if (s.type === "lightning") {
+                // Horizontal streak with jagged look
+                const cx = s.x + s.width / 2, cy = s.y + s.height / 2;
+                this.ctx.fillRect(s.x, cy - 3, s.width, 6);
+                this.ctx.fillStyle = "#fff";
+                this.ctx.shadowBlur = 0;
+                this.ctx.fillRect(s.x + 2, cy - 1, s.width - 4, 2);
+            } else if (s.type === "ice") {
+                // Diamond shape
+                const cx = s.x + s.width / 2, cy = s.y + s.height / 2;
+                this.ctx.beginPath();
+                this.ctx.moveTo(cx, cy - s.height / 2);
+                this.ctx.lineTo(cx + s.width / 2, cy);
+                this.ctx.lineTo(cx, cy + s.height / 2);
+                this.ctx.lineTo(cx - s.width / 2, cy);
+                this.ctx.closePath();
+                this.ctx.fill();
+            } else if (s.type === "arcane") {
+                // Pulsing orb
+                const pulse = 0.8 + 0.2 * Math.sin(Date.now() * 0.015);
+                this.ctx.beginPath();
+                this.ctx.arc(s.x + s.width / 2, s.y + s.height / 2, (s.width / 2) * pulse, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.fillStyle = "#f0abfc";
+                this.ctx.shadowBlur = 0;
+                this.ctx.beginPath();
+                this.ctx.arc(s.x + s.width / 2, s.y + s.height / 2, (s.width / 4) * pulse, 0, Math.PI * 2);
+                this.ctx.fill();
+            } else {
+                this.ctx.fillRect(s.x, s.y, s.width, s.height);
+            }
+            this.ctx.shadowBlur = 0;
+            this.ctx.restore();
+        });
 
         this.enemyProjectiles.forEach(ep => {
             this.ctx.fillStyle = "#f472b6";
@@ -589,6 +746,40 @@ class Game {
             this.ctx.fillText(this.bannerSubText, this.canvas.width / 2, bannerY + 44);
 
             this.ctx.shadowBlur = 0;
+            this.ctx.globalAlpha = 1;
+            this.ctx.restore();
+        }
+
+        // Spell HUD — bottom-left corner
+        if (!this.gameOver && !this.gameWon) {
+            const spellDefs = this.SPELL_DEFS;
+            const sel = this.player.selectedSpell;
+            const hudX = 12, hudY = this.canvas.height - 60;
+            const boxW = 110, boxH = 46;
+
+            this.ctx.save();
+            this.ctx.globalAlpha = 0.88;
+            this.ctx.fillStyle = "rgba(10, 5, 30, 0.7)";
+            this.ctx.strokeStyle = spellDefs[sel].color;
+            this.ctx.lineWidth = 2;
+            this.ctx.beginPath();
+            this.ctx.roundRect(hudX, hudY, boxW, boxH, 8);
+            this.ctx.fill();
+            this.ctx.stroke();
+
+            this.ctx.shadowColor = spellDefs[sel].color;
+            this.ctx.shadowBlur = 8;
+            this.ctx.fillStyle = spellDefs[sel].color;
+            this.ctx.font = "bold 14px sans-serif";
+            this.ctx.textAlign = "left";
+            this.ctx.fillText(spellDefs[sel].icon + " " + spellDefs[sel].name, hudX + 8, hudY + 20);
+            this.ctx.shadowBlur = 0;
+            this.ctx.fillStyle = "#94a3b8";
+            this.ctx.font = "11px sans-serif";
+            this.ctx.fillText(spellDefs[sel].desc, hudX + 8, hudY + 36);
+            this.ctx.fillStyle = "#4b5563";
+            this.ctx.font = "10px sans-serif";
+            this.ctx.fillText("Q / E to switch", hudX + 8, hudY + 48);
             this.ctx.globalAlpha = 1;
             this.ctx.restore();
         }

@@ -102,7 +102,7 @@
                 display: none;
             }
             .header-ui::after {
-                content: " | Controls: A/D to Move, W to Jump, Space to Cast Magic";
+                content: " | A/D: Move · W: Jump · Space: Cast · Q/E: Switch Spell";
                 font-size: 11px;
                 color: #6d28d9;
             }
@@ -123,12 +123,14 @@
     
     <div id="touchControls">
         <div class="d-pad">
-            <div class="btn" id="btnLeft" data-input="left">⬅️</div>
-            <div class="btn" id="btnRight" data-input="right">➡️</div>
+            <div class="btn" id="btnLeft" data-input="left">⬅️</div>
+            <div class="btn" id="btnRight" data-input="right">➡️</div>
         </div>
         <div class="action-pad">
-            <div class="btn btn-wide" id="btnMagic" data-input="magic">✨</div>
-            <div class="btn" id="btnJump" data-input="jump">🔼</div>
+            <div class="btn" id="btnPrevSpell" data-input="prevSpell" style="width:56px;height:56px;font-size:14px;background:rgba(139,92,246,0.2);border-color:#6d28d9;">◀</div>
+            <div class="btn btn-wide" id="btnMagic" data-input="magic">✨</div>
+            <div class="btn" id="btnNextSpell" data-input="nextSpell" style="width:56px;height:56px;font-size:14px;background:rgba(139,92,246,0.2);border-color:#6d28d9;">▶</div>
+            <div class="btn" id="btnJump" data-input="jump">🔼</div>
         </div>
     </div>
 </div>
