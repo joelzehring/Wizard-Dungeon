@@ -74,7 +74,7 @@ class Game {
 
     initInputs() {
         window.addEventListener("keydown", e => {
-            if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "KeyW", "KeyA", "KeyS", "KeyD"].includes(e.code)) {
+            if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "KeyW", "KeyA", "KeyS", "KeyD", "KeyQ", "KeyE"].includes(e.code)) {
                 e.preventDefault();
             }
             if (this.inTitleScreen) {
@@ -85,8 +85,8 @@ class Game {
             if (e.code === "ArrowLeft" || e.code === "KeyA") this.inputs.left = true;
             if (e.code === "ArrowUp" || e.code === "KeyW") this.inputs.jump = true;
             if (e.code === "Space") this.inputs.magic = true;
-            if (e.code === "KeyE") this.inputs.nextSpell = true;
-            if (e.code === "KeyQ") this.inputs.prevSpell = true;
+            if (e.code === "KeyE" && !e.repeat) this.inputs.nextSpell = true;
+            if (e.code === "KeyQ" && !e.repeat) this.inputs.prevSpell = true;
         });
 
         window.addEventListener("keyup", e => {
@@ -95,6 +95,8 @@ class Game {
             if (e.code === "ArrowLeft" || e.code === "KeyA") this.inputs.left = false;
             if (e.code === "ArrowUp" || e.code === "KeyW") this.inputs.jump = false;
             if (e.code === "Space") this.inputs.magic = false;
+            if (e.code === "KeyE") this.inputs.nextSpell = false;
+            if (e.code === "KeyQ") this.inputs.prevSpell = false;
         });
 
         window.addEventListener("blur", () => {
