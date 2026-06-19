@@ -1,4 +1,4 @@
-import { Enemy, Boss, FlyingEnemy } from './entities/Enemy.js';
+import { Enemy, Boss, FlyingEnemy, ShadowGoblin } from './entities/Enemy.js';
 import { PowerUp } from './entities/PowerUp.js';
 
 export class Level {
@@ -14,6 +14,7 @@ export class Level {
         this.crystals = data.crystals.map(c => ({ ...c }));
         this.enemies = data.enemies.map(e => {
             if (e.type === 'flying') return new FlyingEnemy(e);
+            if (e.type === 'shadowGoblin') return new ShadowGoblin(e);
             return new Enemy(e);
         });
         this.powerUps = (data.powerUps || []).map(p => new PowerUp(p.x, p.y, p.type));
@@ -31,6 +32,7 @@ export class Level {
         this.bonusPlatformColor = data.bonusPlatformColor || "#6d28d9";
         this.bonusEnemies = (data.bonusEnemies || []).map(e => {
             if (e.type === 'flying') return new FlyingEnemy(e);
+            if (e.type === 'shadowGoblin') return new ShadowGoblin(e);
             return new Enemy(e);
         });
         this.bonusCrystals = (data.bonusCrystals || []).map(c => ({ ...c }));

@@ -209,9 +209,9 @@ export const levelData = [
             { x: 1750, y: 230, width: 16, height: 20, collected: false }
         ],
         enemies: [
-            { x: 200, y: 368, width: 24, height: 32, minX: 80, maxX: 450, speed: 2.5, alive: true },
-            { x: 1300, y: 368, width: 24, height: 32, minX: 1210, maxX: 1550, speed: 2.5, alive: true },
-            { x: 2250, y: 368, width: 24, height: 32, minX: 2160, maxX: 2400, speed: 3.0, alive: true },
+            { x: 200, y: 368, width: 24, height: 32, minX: 80, maxX: 450, speed: 2.5, type: 'shadowGoblin', alive: true },
+            { x: 1300, y: 368, width: 24, height: 32, minX: 1210, maxX: 1550, speed: 2.5, type: 'shadowGoblin', alive: true },
+            { x: 2250, y: 368, width: 24, height: 32, minX: 2160, maxX: 2400, speed: 3.0, type: 'shadowGoblin', alive: true },
             { x: 800, y: 100, width: 32, height: 32, minX: 600, maxX: 1000, speed: 2.5, type: 'flying', alive: true },
             { x: 1700, y: 150, width: 32, height: 32, minX: 1500, maxX: 1900, speed: 3, type: 'flying', alive: true }
         ],
@@ -269,9 +269,9 @@ export const levelData = [
             { x: 1730, y: 150, width: 16, height: 20, collected: false }
         ],
         enemies: [
-            { x: 300, y: 368, width: 24, height: 32, minX: 100, maxX: 450, speed: 2.0, alive: true },
+            { x: 300, y: 368, width: 24, height: 32, minX: 100, maxX: 450, speed: 2.0, type: 'shadowGoblin', alive: true },
             { x: 800, y: 100, width: 32, height: 32, minX: 650, maxX: 950, speed: 2.4, type: 'flying', alive: true },
-            { x: 1500, y: 368, width: 24, height: 32, minX: 1350, maxX: 1800, speed: 2.2, alive: true },
+            { x: 1500, y: 368, width: 24, height: 32, minX: 1350, maxX: 1800, speed: 2.2, type: 'shadowGoblin', alive: true },
             { x: 1800, y: 80, width: 32, height: 32, minX: 1600, maxX: 2000, speed: 2.6, type: 'flying', alive: true }
         ],
         powerUps: [
@@ -331,10 +331,10 @@ export const levelData = [
             { x: 1900, y: 150, width: 16, height: 20, collected: false }
         ],
         enemies: [
-            { x: 150, y: 368, width: 24, height: 32, minX: 50, maxX: 350, speed: 2.2, alive: true },
+            { x: 150, y: 368, width: 24, height: 32, minX: 50, maxX: 350, speed: 2.2, type: 'shadowGoblin', alive: true },
             { x: 500, y: 150, width: 32, height: 32, minX: 400, maxX: 600, speed: 2.5, type: 'flying', alive: true },
             { x: 950, y: 100, width: 32, height: 32, minX: 850, maxX: 1100, speed: 2.8, type: 'flying', alive: true },
-            { x: 1650, y: 368, width: 24, height: 32, minX: 1550, maxX: 1950, speed: 2.5, alive: true },
+            { x: 1650, y: 368, width: 24, height: 32, minX: 1550, maxX: 1950, speed: 2.5, type: 'shadowGoblin', alive: true },
             { x: 2000, y: 120, width: 32, height: 32, minX: 1800, maxX: 2200, speed: 3.0, type: 'flying', alive: true }
         ],
         powerUps: [

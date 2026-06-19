@@ -348,14 +348,27 @@ class Game {
                 for (let sIdx = this.spells.length - 1; sIdx >= 0; sIdx--) {
                     const spell = this.spells[sIdx];
                     if (checkAABBCollision(spell, enemy)) {
-                        enemy.alive = false;
                         const burstColor = spell.type === "fireball" ? "#f97316" : spell.type === "ice" ? "#a5f3fc" : spell.type === "arcane" ? "#c084fc" : "#facc15";
-                        if (spell.type === "fireball") {
-                            createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#f97316", 30);
-                            createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#fbbf24", 16);
-                            this.triggerFlash("#f97316", 0.2);
+                        // Damage hp if present, otherwise kill instantly
+                        if (enemy.hp !== undefined) {
+                            enemy.hp--;
+                            if (enemy.hp <= 0) {
+                                enemy.alive = false;
+                                createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#a855f7", 20);
+                                createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, burstColor, 12);
+                            } else {
+                                // Hit flash — small purple burst
+                                createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#7c3aed", 8);
+                            }
                         } else {
-                            createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, burstColor, 16);
+                            enemy.alive = false;
+                            if (spell.type === "fireball") {
+                                createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#f97316", 30);
+                                createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#fbbf24", 16);
+                                this.triggerFlash("#f97316", 0.2);
+                            } else {
+                                createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, burstColor, 16);
+                            }
                         }
                         if (!spell.piercing) this.spells.splice(sIdx, 1);
                     }
@@ -370,13 +383,24 @@ class Game {
                 for (let sIdx = this.spells.length - 1; sIdx >= 0; sIdx--) {
                     const spell = this.spells[sIdx];
                     if (checkAABBCollision(spell, enemy)) {
-                        enemy.alive = false;
                         const burstColor = spell.type === "fireball" ? "#f97316" : spell.type === "ice" ? "#a5f3fc" : spell.type === "arcane" ? "#c084fc" : "#facc15";
-                        if (spell.type === "fireball") {
-                            createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#f97316", 30);
-                            createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#fbbf24", 16);
+                        if (enemy.hp !== undefined) {
+                            enemy.hp--;
+                            if (enemy.hp <= 0) {
+                                enemy.alive = false;
+                                createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#a855f7", 20);
+                                createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, burstColor, 12);
+                            } else {
+                                createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#7c3aed", 8);
+                            }
                         } else {
-                            createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, burstColor, 16);
+                            enemy.alive = false;
+                            if (spell.type === "fireball") {
+                                createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#f97316", 30);
+                                createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, "#fbbf24", 16);
+                            } else {
+                                createBurst(this.particles, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, burstColor, 16);
+                            }
                         }
                         if (!spell.piercing) this.spells.splice(sIdx, 1);
                     }

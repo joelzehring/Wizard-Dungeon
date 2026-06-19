@@ -34,6 +34,57 @@ export class Enemy {
     }
 }
 
+export class ShadowGoblin extends Enemy {
+    constructor(config) {
+        super(config);
+        this.maxHp = config.hp || 3;
+        this.hp = this.maxHp;
+    }
+
+    draw(ctx) {
+        if (!this.alive) return;
+        ctx.save();
+        ctx.translate(this.x, this.y);
+
+        // Shadow aura
+        const pulse = 0.5 + 0.5 * Math.sin(Date.now() * 0.005);
+        ctx.shadowColor = "#7c3aed";
+        ctx.shadowBlur = 6 + pulse * 6;
+
+        // Body — darker, with purple tint
+        ctx.fillStyle = "#0d0721"; ctx.fillRect(0, 8, this.width, this.height - 8);
+        // Cloak highlights
+        ctx.fillStyle = "#3b0764"; ctx.fillRect(0, 8, 3, this.height - 8);
+        ctx.fillRect(this.width - 3, 8, 3, this.height - 8);
+        // Head
+        ctx.fillStyle = "#2e1065"; ctx.fillRect(2, 0, this.width - 4, 10);
+        // Glowing eyes
+        ctx.shadowColor = "#a855f7";
+        ctx.shadowBlur = 8;
+        ctx.fillStyle = "#a855f7";
+        if (this.speed > 0) {
+            ctx.fillRect(this.width - 7, 3, 3, 3); ctx.fillRect(this.width - 12, 3, 3, 3);
+        } else {
+            ctx.fillRect(4, 3, 3, 3); ctx.fillRect(9, 3, 3, 3);
+        }
+
+        ctx.shadowBlur = 0;
+
+        // HP bar (only show if damaged)
+        if (this.hp < this.maxHp) {
+            const barW = this.width + 4;
+            const barX = -2;
+            const barY = -8;
+            ctx.fillStyle = "#1a0030";
+            ctx.fillRect(barX, barY, barW, 4);
+            ctx.fillStyle = "#7c3aed";
+            ctx.fillRect(barX, barY, barW * (this.hp / this.maxHp), 4);
+        }
+
+        ctx.restore();
+    }
+}
+
 export class FlyingEnemy extends Enemy {
     constructor(config) {
         super(config);
