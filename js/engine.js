@@ -2,6 +2,7 @@ import { levelData } from './data/levels.js';
 import { Player } from './entities/Player.js';
 import { Level } from './Level.js';
 import { checkAABBCollision, createBurst } from './utils.js';
+import { WardrobeUI } from './WardrobeUI.js';
 
 class Game {
     constructor() {
@@ -39,6 +40,8 @@ class Game {
         if (livesCont) livesCont.style.opacity = "0";
         const starsCont = document.getElementById("starsContainer");
         if (starsCont) starsCont.style.opacity = "0";
+        const crystalsCont = document.getElementById("crystalsContainer");
+        if (crystalsCont) crystalsCont.style.opacity = "0";
 
         this.camera = { x: 0, width: this.canvas.width, height: this.canvas.height };
         this.inputs = { left: false, right: false, jump: false, magic: false, nextSpell: false, prevSpell: false };
@@ -50,16 +53,27 @@ class Game {
         ];
 
         this.player = new Player();
+        this.wardrobe = new WardrobeUI(this);
+        this.player.setCosmetics(this.wardrobe.state.equipped);
+
+        // Connect header wardrobe button
+        const headerBtn = document.getElementById("headerWardrobeBtn");
+        if (headerBtn) {
+            headerBtn.addEventListener("click", () => this.wardrobe.open());
+        }
+
         this.activeLevel = null;
         this.spells = [];
         this.particles = [];
         this.enemyProjectiles = [];
 
+        this.updateHeaderWallet();
         this.initInputs();
         this.loop();
     }
 
     startGame() {
+        if (this.wardrobe.isOpen) return;
         this.inTitleScreen = false;
         this.levelDisplay.style.opacity = "1";
         this.objectiveDisplay.style.opacity = "1";
@@ -67,13 +81,36 @@ class Game {
         if (livesCont) livesCont.style.opacity = "1";
         const starsCont = document.getElementById("starsContainer");
         if (starsCont) starsCont.style.opacity = "1";
+        const crystalsCont = document.getElementById("crystalsContainer");
+        if (crystalsCont) crystalsCont.style.opacity = "1";
 
         this.particles = [];
         this.loadLevel(0);
     }
 
+    updateHeaderWallet() {
+        const crystalsDisplay = document.getElementById("crystalsDisplay");
+        if (crystalsDisplay) {
+            crystalsDisplay.innerText = this.wardrobe.state.crystals;
+        }
+    }
+
     initInputs() {
         window.addEventListener("keydown", e => {
+            if (e.code === "KeyC" && !e.repeat) {
+                if (this.wardrobe.isOpen) {
+                    this.wardrobe.close();
+                } else {
+                    this.wardrobe.open();
+                }
+                return;
+            }
+
+            if (this.wardrobe.isOpen) {
+                if (e.code === "Escape") this.wardrobe.close();
+                return;
+            }
+
             if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "KeyW", "KeyA", "KeyS", "KeyD", "KeyQ", "KeyE"].includes(e.code)) {
                 e.preventDefault();
             }
@@ -90,7 +127,7 @@ class Game {
         });
 
         window.addEventListener("keyup", e => {
-            if (this.inTitleScreen) return;
+            if (this.wardrobe.isOpen || this.inTitleScreen) return;
             if (e.code === "ArrowRight" || e.code === "KeyD") this.inputs.right = false;
             if (e.code === "ArrowLeft" || e.code === "KeyA") this.inputs.left = false;
             if (e.code === "ArrowUp" || e.code === "KeyW") this.inputs.jump = false;
@@ -110,6 +147,7 @@ class Game {
             if (!inputAction) return;
 
             btn.addEventListener('pointerdown', (e) => {
+                if (this.wardrobe.isOpen) return;
                 e.preventDefault();
                 if (this.inTitleScreen) {
                     this.startGame();
@@ -120,6 +158,7 @@ class Game {
             }, { passive: false });
 
             btn.addEventListener('pointerup', (e) => {
+                if (this.wardrobe.isOpen) return;
                 e.preventDefault();
                 if (this.inTitleScreen) return;
                 this.inputs[inputAction] = false;
@@ -127,6 +166,7 @@ class Game {
             }, { passive: false });
 
             btn.addEventListener('pointercancel', (e) => {
+                if (this.wardrobe.isOpen) return;
                 e.preventDefault();
                 if (this.inTitleScreen) return;
                 this.inputs[inputAction] = false;
@@ -135,6 +175,7 @@ class Game {
         });
 
         this.canvas.addEventListener("click", () => {
+            if (this.wardrobe.isOpen) return;
             if (this.inTitleScreen) {
                 this.startGame();
                 return;
@@ -155,6 +196,7 @@ class Game {
         this.score = 0;
 
         this.player.reset();
+        this.player.setCosmetics(this.wardrobe.state.equipped);
         this.spells = [];
         this.particles = [];
         this.enemyProjectiles = [];
@@ -169,6 +211,7 @@ class Game {
         this.scoreDisplay = document.getElementById("scoreDisplay");
         this.updateLivesUI();
         this.updateStarsUI();
+        this.updateHeaderWallet();
     }
 
     updateLivesUI() {
@@ -280,6 +323,10 @@ class Game {
                     this.score++;
                     this.scoreDisplay.innerText = `${this.score}/${level.crystals.length}`;
                     createBurst(this.particles, crystal.x + 8, crystal.y + 10, "#00ffff");
+
+                    // Add persistent currency
+                    this.wardrobe.addCurrency(1, 0);
+                    this.updateHeaderWallet();
                 }
             });
 
@@ -289,6 +336,10 @@ class Game {
                     crystal.collected = true;
                     createBurst(this.particles, crystal.x + 8, crystal.y + 10, "#fbbf24", 12);
                     this.triggerFlash("#fbbf24", 0.25);
+
+                    // Add persistent bonus currency (2 crystals)
+                    this.wardrobe.addCurrency(2, 0);
+                    this.updateHeaderWallet();
                 }
             });
 
@@ -326,6 +377,11 @@ class Game {
                     level.star.collected = true;
                     this.totalStars++;
                     this.updateStarsUI();
+
+                    // Add persistent star currency
+                    this.wardrobe.addCurrency(0, 1);
+                    this.updateHeaderWallet();
+
                     // Bonus life (up to 5)
                     if (this.lives < 5) {
                         this.lives++;
@@ -465,6 +521,8 @@ class Game {
     }
 
     update() {
+        if (this.wardrobe && this.wardrobe.isOpen) return;
+
         if (this.inTitleScreen) {
             // Spawn slow-drifting magical background particles
             if (this.particles.length < 40 && Math.random() > 0.7) {
@@ -633,8 +691,13 @@ class Game {
             // Pulsing start text
             let pulse = Math.abs(Math.sin(Date.now() * 0.003));
             this.ctx.fillStyle = `rgba(244, 63, 94, ${0.4 + pulse * 0.6})`;
-            this.ctx.font = "bold 18px sans-serif";
-            this.ctx.fillText("PRESS SPACE OR TAP TO ENTER", this.canvas.width / 2, this.canvas.height / 2 + 60);
+            this.ctx.font = "bold 17px sans-serif";
+            this.ctx.fillText("PRESS SPACE OR TAP TO ENTER", this.canvas.width / 2, this.canvas.height / 2 + 50);
+
+            // Wardrobe hint text
+            this.ctx.fillStyle = "#c084fc";
+            this.ctx.font = "bold 13px sans-serif";
+            this.ctx.fillText("PRESS 'C' OR CLICK 👗 WARDROBE TO CUSTOMIZE YOUR WIZARD", this.canvas.width / 2, this.canvas.height / 2 + 75);
 
             // Control guidelines card
             this.ctx.fillStyle = "rgba(139, 92, 246, 0.1)";
@@ -649,7 +712,7 @@ class Game {
 
             this.ctx.font = "12px sans-serif";
             this.ctx.fillStyle = "#cbd5e1";
-            this.ctx.fillText("A / D or ⬅️ / ➡️ : MOVE", this.canvas.width / 2, this.canvas.height / 2 + 145);
+            this.ctx.fillText("A / D or ⬅️ / ➡️ : MOVE · C : WARDROBE", this.canvas.width / 2, this.canvas.height / 2 + 145);
             this.ctx.fillText("W or 🔼 : JUMP / DOUBLE JUMP", this.canvas.width / 2, this.canvas.height / 2 + 165);
             this.ctx.fillText("SPACE or ✨ BUTTON : CAST MAGIC SPELL", this.canvas.width / 2, this.canvas.height / 2 + 185);
 
