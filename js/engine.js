@@ -348,9 +348,14 @@ class Game {
                 const riftRect = { x: level.rift.x, y: level.rift.y, width: level.rift.width, height: level.rift.height };
                 if (checkAABBCollision(wizard, riftRect)) {
                     level.rift.entered = true;
-                    wizard.x = level.rift.targetX || 4050;
-                    wizard.y = level.rift.targetY || 300;
+                    wizard.x = level.rift.targetX || 4030;
+                    wizard.y = level.rift.targetY || 340;
                     wizard.vx = 0; wizard.vy = 0;
+
+                    // Grant 1.5 seconds of invincibility grace period
+                    wizard.invincible = true;
+                    setTimeout(() => { wizard.invincible = false; }, 1500);
+
                     this.triggerFlash("#d946ef", 0.8);
                     createBurst(this.particles, wizard.x + wizard.width / 2, wizard.y + wizard.height / 2, "#d946ef", 40);
                     this.showBanner("SECRET BONUS AREA!", "Collect the Golden Star!", "#d946ef");
@@ -362,8 +367,13 @@ class Game {
                 const rpRect = { x: level.returnPortal.x, y: level.returnPortal.y, width: level.returnPortal.width, height: level.returnPortal.height };
                 if (checkAABBCollision(wizard, rpRect)) {
                     wizard.x = level.returnPortal.targetX || (level.portalX - 100);
-                    wizard.y = level.returnPortal.targetY || level.portalY;
+                    wizard.y = level.returnPortal.targetY || (level.portalY - 50);
                     wizard.vx = 0; wizard.vy = 0;
+
+                    // Grant 1.5 seconds of invincibility grace period
+                    wizard.invincible = true;
+                    setTimeout(() => { wizard.invincible = false; }, 1500);
+
                     this.triggerFlash("#10b981", 0.7);
                     createBurst(this.particles, wizard.x + wizard.width / 2, wizard.y + wizard.height / 2, "#10b981", 30);
                     this.showBanner("RETURNED!", "Find all 6 stars!", "#10b981", 90);
