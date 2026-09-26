@@ -250,6 +250,26 @@ class Game {
         }
     }
 
+    handlePlayerDamage() {
+        if (this.player.hasPet) {
+            this.player.hasPet = false;
+            this.player.invincible = true;
+            setTimeout(() => {
+                this.player.invincible = false;
+            }, 1500);
+
+            const px = this.player.x + this.player.width / 2;
+            const py = this.player.y + this.player.height / 2;
+            createBurst(this.particles, px, py, "#f472b6", 30);
+            createBurst(this.particles, px, py, "#67e8f9", 20);
+            createBurst(this.particles, px, py, "#34d399", 15);
+            this.triggerFlash("#f472b6", 0.45);
+            this.showBanner("🛡️ PET SHIELDED YOU!", "Your pet absorbed the damage!", "#f472b6", 150);
+        } else {
+            this.handlePlayerDeath();
+        }
+    }
+
     castSpell(p) {
         const dir = p.facing === "right" ? 1 : -1;
         const ox = p.facing === "right" ? p.x + p.width + 5 : p.x - 15;
@@ -297,6 +317,26 @@ class Game {
                     homing: true
                 });
                 break;
+        }
+
+        // Pet Companion Extra Weapon Shot
+        if (p.hasPet) {
+            const petX = p.facing === "right" ? p.x - 16 : p.x + p.width + 4;
+            const petY = p.y - 10;
+            this.spells.push({
+                type: "petSpirit",
+                x: petX,
+                y: petY,
+                vx: dir * 12,
+                vy: (Math.random() - 0.5) * 1.5,
+                width: 14,
+                height: 14,
+                life: 60,
+                piercing: true,
+                color: "#f472b6"
+            });
+            createBurst(this.particles, petX + 7, petY + 7, "#f472b6", 8);
+            createBurst(this.particles, petX + 7, petY + 7, "#67e8f9", 5);
         }
     }
 
@@ -409,7 +449,7 @@ class Game {
             // Normal enemies
             level.enemies.forEach(enemy => {
                 if (!enemy.alive) return;
-                if (!wizard.invincible && checkAABBCollision(wizard, enemy)) this.handlePlayerDeath();
+                if (!wizard.invincible && checkAABBCollision(wizard, enemy)) this.handlePlayerDamage();
 
                 for (let sIdx = this.spells.length - 1; sIdx >= 0; sIdx--) {
                     const spell = this.spells[sIdx];
@@ -444,7 +484,7 @@ class Game {
             // Bonus area enemies
             level.bonusEnemies.forEach(enemy => {
                 if (!enemy.alive) return;
-                if (!wizard.invincible && checkAABBCollision(wizard, enemy)) this.handlePlayerDeath();
+                if (!wizard.invincible && checkAABBCollision(wizard, enemy)) this.handlePlayerDamage();
 
                 for (let sIdx = this.spells.length - 1; sIdx >= 0; sIdx--) {
                     const spell = this.spells[sIdx];
@@ -481,10 +521,10 @@ class Game {
                 }
             }
         } else if (level.isBossLevel && level.boss.alive) {
-            if (!wizard.invincible && checkAABBCollision(wizard, level.boss)) this.handlePlayerDeath();
+            if (!wizard.invincible && checkAABBCollision(wizard, level.boss)) this.handlePlayerDamage();
 
             this.enemyProjectiles.forEach(proj => {
-                if (!wizard.invincible && checkAABBCollision(wizard, proj)) this.handlePlayerDeath();
+                if (!wizard.invincible && checkAABBCollision(wizard, proj)) this.handlePlayerDamage();
             });
 
             for (let sIdx = this.spells.length - 1; sIdx >= 0; sIdx--) {
@@ -523,6 +563,10 @@ class Game {
                     wizard.speed = wizard.baseSpeed * 1.5;
                 } else if (p.type === 'doubleJump') {
                     wizard.hasDoubleJump = true;
+                } else if (p.type === 'pet') {
+                    wizard.hasPet = true;
+                    this.triggerFlash("#f472b6", 0.3);
+                    this.showBanner("🐾 PET COMPANION ACQUIRED!", "Absorbs 1 hit & shoots spirit bolts!", "#f472b6", 200);
                 }
             }
         });
@@ -778,6 +822,17 @@ class Game {
                 this.ctx.shadowBlur = 0;
                 this.ctx.beginPath();
                 this.ctx.arc(s.x + s.width / 2, s.y + s.height / 2, (s.width / 4) * pulse, 0, Math.PI * 2);
+                this.ctx.fill();
+            } else if (s.type === "petSpirit") {
+                // Pulsing pink & cyan star spirit bolt
+                const cx = s.x + s.width / 2, cy = s.y + s.height / 2;
+                this.ctx.beginPath();
+                this.ctx.arc(cx, cy, s.width / 2, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.fillStyle = "#67e8f9";
+                this.ctx.shadowBlur = 0;
+                this.ctx.beginPath();
+                this.ctx.arc(cx, cy, s.width / 4, 0, Math.PI * 2);
                 this.ctx.fill();
             } else {
                 this.ctx.fillRect(s.x, s.y, s.width, s.height);

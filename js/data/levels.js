@@ -33,6 +33,7 @@ export const levelData = [
             { x: 1100, y: 368, width: 24, height: 32, minX: 850, maxX: 1350, speed: 1.8, alive: true }
         ],
         powerUps: [
+            { x: 500, y: 185, type: 'pet' },
             { x: 1000, y: 240, type: 'haste' }
         ],
         // Bonus Area
@@ -86,6 +87,7 @@ export const levelData = [
             { x: 1000, y: 100, width: 32, height: 32, minX: 800, maxX: 1200, speed: 2, type: 'flying', alive: true }
         ],
         powerUps: [
+            { x: 900, y: 210, type: 'pet' },
             { x: 1250, y: 310, type: 'doubleJump' }
         ],
         // Bonus Area
@@ -143,6 +145,7 @@ export const levelData = [
             { x: 1500, y: 120, width: 32, height: 32, minX: 1300, maxX: 1700, speed: 2.2, type: 'flying', alive: true }
         ],
         powerUps: [
+            { x: 800, y: 200, type: 'pet' },
             { x: 1150, y: 260, type: 'haste' }
         ],
         // Bonus Area
@@ -215,7 +218,9 @@ export const levelData = [
             { x: 800, y: 100, width: 32, height: 32, minX: 600, maxX: 1000, speed: 2.5, type: 'flying', alive: true },
             { x: 1700, y: 150, width: 32, height: 32, minX: 1500, maxX: 1900, speed: 3, type: 'flying', alive: true }
         ],
-        powerUps: [],
+        powerUps: [
+            { x: 1350, y: 210, type: 'pet' }
+        ],
         // Bonus Area
         rift: { x: 2210, y: 350, width: 40, height: 70, targetX: 4020, targetY: 340 },
         bonusAreaBgGradient: ["#12022a", "#240341"],
@@ -275,6 +280,7 @@ export const levelData = [
             { x: 1800, y: 80, width: 32, height: 32, minX: 1600, maxX: 2000, speed: 2.6, type: 'flying', alive: true }
         ],
         powerUps: [
+            { x: 750, y: 180, type: 'pet' },
             { x: 1650, y: 160, type: 'haste' }
         ],
         // Bonus Area
@@ -338,6 +344,7 @@ export const levelData = [
             { x: 2000, y: 120, width: 32, height: 32, minX: 1800, maxX: 2200, speed: 3.0, type: 'flying', alive: true }
         ],
         powerUps: [
+            { x: 900, y: 180, type: 'pet' },
             { x: 1250, y: 260, type: 'haste' }
         ],
         // Bonus Area

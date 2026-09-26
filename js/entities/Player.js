@@ -43,6 +43,7 @@ export class Player {
         this.speed = this.baseSpeed || 4.5;
         this.canDoubleJump = false;
         this.invincible = false;
+        this.hasPet = false;
         this.auraParticles = [];
     }
 
@@ -217,6 +218,61 @@ export class Player {
             ctx.fillRect(9, 12, 3, 3);
             this.drawStaff(ctx, "left");
         }
+
+        // --- PET COMPANION ---
+        this.drawPet(ctx);
+
+        ctx.restore();
+    }
+
+    drawPet(ctx) {
+        if (!this.hasPet) return;
+
+        const t = Date.now() * 0.005;
+        const hoverY = Math.sin(t) * 4;
+        const petX = this.facing === "right" ? -16 : this.width + 4;
+        const petY = -10 + hoverY;
+
+        ctx.save();
+        ctx.translate(petX, petY);
+
+        // Glowing outer aura
+        const auraGrad = ctx.createRadialGradient(8, 8, 2, 8, 8, 14);
+        auraGrad.addColorStop(0, "rgba(244, 114, 182, 0.9)");
+        auraGrad.addColorStop(0.6, "rgba(192, 132, 252, 0.4)");
+        auraGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = auraGrad;
+        ctx.beginPath();
+        ctx.arc(8, 8, 14, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cute Spirit Pet Body
+        ctx.fillStyle = "#f472b6";
+        ctx.beginPath();
+        ctx.arc(8, 8, 8, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Inner bright core
+        ctx.fillStyle = "#fef08a";
+        ctx.beginPath();
+        ctx.arc(6, 6, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eyes
+        ctx.fillStyle = "#1e1b4b";
+        const eyeX = this.facing === "right" ? 10 : 3;
+        ctx.fillRect(eyeX, 6, 2, 3);
+        ctx.fillRect(eyeX + (this.facing === "right" ? 3 : 3), 6, 2, 3);
+
+        // Wings
+        const wingFlap = Math.sin(t * 3) * 3;
+        ctx.fillStyle = "#e0e7ff";
+        ctx.beginPath();
+        ctx.ellipse(-1, 4 + wingFlap, 4, 2, -0.4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(17, 4 + wingFlap, 4, 2, 0.4, 0, Math.PI * 2);
+        ctx.fill();
 
         ctx.restore();
     }
