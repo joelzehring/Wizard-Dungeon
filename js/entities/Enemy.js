@@ -128,6 +128,7 @@ export class Boss extends Enemy {
         this.hoverTime = 0;
         this.basePosition = config.y;
         this.isFinal = config.isFinal || false;
+        this.isTitan = config.isTitan || false;
     }
 
     update(projectiles) {
@@ -138,14 +139,32 @@ export class Boss extends Enemy {
 
         // Auto Attack sequence
         this.shootCooldown++;
-        if (this.shootCooldown >= 90) { // Fires every 1.5 seconds
-            projectiles.push({
-                x: this.x - 15,
-                y: this.y + 35,
-                vx: -5,
-                width: 16, height: 16
-            });
-            this.shootCooldown = 0;
+        if (this.isTitan) {
+            if (this.shootCooldown >= 70) { // Dual titan spirit spheres
+                projectiles.push({
+                    x: this.x - 15,
+                    y: this.y + 35,
+                    vx: -6, vy: 0,
+                    width: 18, height: 18, color: "#38bdf8"
+                });
+                projectiles.push({
+                    x: this.x + 20,
+                    y: this.y + 60,
+                    vx: -4.5, vy: 2.2,
+                    width: 14, height: 14, color: "#a855f7"
+                });
+                this.shootCooldown = 0;
+            }
+        } else {
+            if (this.shootCooldown >= 90) { // Fires every 1.5 seconds
+                projectiles.push({
+                    x: this.x - 15,
+                    y: this.y + 35,
+                    vx: -5, vy: 0,
+                    width: 16, height: 16
+                });
+                this.shootCooldown = 0;
+            }
         }
     }
 
@@ -156,9 +175,48 @@ export class Boss extends Enemy {
         
         // Health Bar Overlay
         ctx.fillStyle = "#450a0a"; ctx.fillRect(-10, -20, 84, 8);
-        ctx.fillStyle = "#ef4444"; ctx.fillRect(-10, -20, 84 * (this.hp / this.maxHp), 8);
+        ctx.fillStyle = this.isTitan ? "#38bdf8" : "#ef4444";
+        ctx.fillRect(-10, -20, 84 * (this.hp / this.maxHp), 8);
         
-        if (this.isFinal) {
+        if (this.isTitan) {
+            // Archon the Titan Overlord Visuals
+            const t = Date.now() * 0.003;
+            ctx.save();
+            ctx.translate(32, 45);
+            ctx.rotate(t);
+            ctx.strokeStyle = "rgba(56, 189, 248, 0.7)";
+            ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.arc(0, 0, 48, 0, Math.PI * 2); ctx.stroke();
+            ctx.strokeStyle = "rgba(168, 85, 247, 0.7)";
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(0, 0, 38, 0, Math.PI * 2); ctx.stroke();
+            ctx.restore();
+
+            // Titan Celestial Armor Cloak (Deep Cyan & Violet)
+            ctx.fillStyle = "#0f172a"; ctx.fillRect(0, 20, this.width, this.height - 20);
+            ctx.fillStyle = "#38bdf8"; ctx.fillRect(0, 20, 6, this.height - 20);
+            ctx.fillStyle = "#38bdf8"; ctx.fillRect(this.width - 6, 20, 6, this.height - 20);
+
+            // Titan Crowned Helmet
+            ctx.fillStyle = "#1e293b"; ctx.fillRect(10, 0, this.width - 20, 25);
+            ctx.fillStyle = "#38bdf8";
+            // Triple Spikes
+            ctx.beginPath();
+            ctx.moveTo(12, 0); ctx.lineTo(16, -12); ctx.lineTo(22, 0); ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(28, 0); ctx.lineTo(32, -18); ctx.lineTo(36, 0); ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(42, 0); ctx.lineTo(48, -12); ctx.lineTo(52, 0); ctx.fill();
+
+            // Piercing Glowing Cyan Eyes
+            let eyePulse = Math.sin(Date.now() * 0.03) * 2;
+            ctx.shadowColor = "#38bdf8";
+            ctx.shadowBlur = 10;
+            ctx.fillStyle = "#38bdf8";
+            ctx.beginPath(); ctx.arc(22, 10, 5 + eyePulse / 2, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(42, 10, 5 + eyePulse / 2, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowBlur = 0;
+        } else if (this.isFinal) {
             // Gorgon Boss Visuals (Crimson Cloak with Gold Trim, Stony Head, writhing green snakes, red eyes)
             
             // Writhing Snake Hair (drawn in a layer behind/above head)

@@ -18,7 +18,7 @@ class Game {
         this.score = 0;
         this.lives = 3;
         this.totalStars = 0;
-        this.maxStars = 6;
+        this.maxStars = 9;
         this.gameOver = false;
         this.gameWon = false;
         this.inTitleScreen = true;
@@ -43,7 +43,7 @@ class Game {
         const crystalsCont = document.getElementById("crystalsContainer");
         if (crystalsCont) crystalsCont.style.opacity = "0";
 
-        this.camera = { x: 0, width: this.canvas.width, height: this.canvas.height };
+        this.camera = { x: 0, y: 0, width: this.canvas.width, height: this.canvas.height };
         this.inputs = { left: false, right: false, jump: false, magic: false, nextSpell: false, prevSpell: false };
         this.SPELL_DEFS = [
             { name: "Lightning Bolt", icon: "⚡", color: "#facc15", desc: "Fast & piercing" },
@@ -527,7 +527,11 @@ class Game {
             }
         });
 
-        if (wizard.y > this.canvas.height + 100) this.handlePlayerDeath();
+        if (level.isVertical) {
+            if (wizard.y > this.camera.y + this.canvas.height + 80) this.handlePlayerDeath();
+        } else {
+            if (wizard.y > this.canvas.height + 100) this.handlePlayerDeath();
+        }
     }
 
     update() {
@@ -569,9 +573,16 @@ class Game {
 
         this.processInteractions();
 
-        this.camera.x = this.player.x - this.canvas.width / 2 + this.player.width / 2;
-        if (this.camera.x < 0) this.camera.x = 0;
-        if (this.activeLevel.isBossLevel && this.camera.x > 150) this.camera.x = 150;
+        if (this.activeLevel && this.activeLevel.isVertical) {
+            this.camera.x = 0;
+            const targetY = this.player.y - this.canvas.height / 2 + this.player.height / 2;
+            this.camera.y = Math.min(0, targetY);
+        } else {
+            this.camera.y = 0;
+            this.camera.x = this.player.x - this.canvas.width / 2 + this.player.width / 2;
+            if (this.camera.x < 0) this.camera.x = 0;
+            if (this.activeLevel && this.activeLevel.isBossLevel && this.camera.x > 150) this.camera.x = 150;
+        }
 
         // Update Spells
         for (let i = this.spells.length - 1; i >= 0; i--) {
@@ -729,10 +740,10 @@ class Game {
             return;
         }
 
-        this.activeLevel.drawEnvironment(this.ctx, this.canvas, this.camera.x, this.score);
+        this.activeLevel.drawEnvironment(this.ctx, this.canvas, this.camera, this.score);
 
         this.ctx.save();
-        this.ctx.translate(-this.camera.x, 0);
+        this.ctx.translate(-this.camera.x, -this.camera.y);
 
         // Spells & Projectiles
         this.spells.forEach(s => {

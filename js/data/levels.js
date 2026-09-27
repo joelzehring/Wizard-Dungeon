@@ -370,5 +370,243 @@ export const levelData = [
         ],
         crystals: [],
         enemies: []
+    },
+    {
+        name: "Realm 7: The Skybound Spires",
+        isBossLevel: false,
+        isVertical: true,
+        bgGradient: ["#020617", "#0f172a"],
+        primaryColor: "#38bdf8",
+        secondaryColor: "#0284c7",
+        portalX: 380, portalY: -1470,
+        platforms: [
+            { x: 50, y: 400, width: 700, height: 50 },
+            { x: 200, y: 310, width: 140, height: 15 },
+            { x: 450, y: 230, width: 140, height: 15 },
+            { x: 220, y: 150, width: 140, height: 15 },
+            { x: 480, y: 70, width: 140, height: 15 },
+            { x: 280, y: -10, width: 140, height: 15 },
+            { x: 100, y: -90, width: 140, height: 15 },
+            { x: 380, y: -170, width: 140, height: 15 },
+            { x: 550, y: -250, width: 140, height: 15 },
+            { x: 300, y: -330, width: 150, height: 15 },
+            { x: 120, y: -410, width: 140, height: 15 },
+            { x: 400, y: -490, width: 140, height: 15 },
+            { x: 200, y: -570, width: 140, height: 15 },
+            { x: 450, y: -650, width: 140, height: 15 },
+            { x: 250, y: -730, width: 140, height: 15 },
+            { x: 500, y: -810, width: 140, height: 15 },
+            { x: 300, y: -890, width: 150, height: 15 },
+            { x: 150, y: -970, width: 140, height: 15 },
+            { x: 400, y: -1050, width: 140, height: 15 },
+            { x: 220, y: -1130, width: 140, height: 15 },
+            { x: 480, y: -1210, width: 140, height: 15 },
+            { x: 280, y: -1290, width: 150, height: 15 },
+            { x: 250, y: -1400, width: 300, height: 30 },
+            // Bonus Spire Area
+            { x: 4000, y: 400, width: 300, height: 50 },
+            { x: 4100, y: 310, width: 120, height: 15 },
+            { x: 4220, y: 220, width: 120, height: 15 },
+            { x: 4100, y: 130, width: 120, height: 15 },
+            { x: 4220, y: 40, width: 120, height: 15 },
+            { x: 4100, y: -50, width: 120, height: 15 },
+            { x: 4120, y: -130, width: 160, height: 30 },
+        ],
+        crystals: [
+            { x: 250, y: 280, width: 16, height: 20, collected: false },
+            { x: 530, y: 40, width: 16, height: 20, collected: false },
+            { x: 150, y: -440, width: 16, height: 20, collected: false },
+            { x: 430, y: -1080, width: 16, height: 20, collected: false },
+            { x: 380, y: -1360, width: 16, height: 20, collected: false }
+        ],
+        enemies: [
+            { x: 300, y: 368, width: 24, height: 32, minX: 100, maxX: 650, speed: 2.0, type: 'shadowGoblin', alive: true },
+            { x: 300, y: 20, width: 32, height: 32, minX: 150, maxX: 650, speed: 2.5, type: 'flying', alive: true },
+            { x: 250, y: -610, width: 24, height: 32, minX: 100, maxX: 600, speed: 2.2, type: 'shadowGoblin', alive: true },
+            { x: 300, y: -1100, width: 32, height: 32, minX: 150, maxX: 650, speed: 2.8, type: 'flying', alive: true }
+        ],
+        powerUps: [
+            { x: 280, y: 110, type: 'pet' },
+            { x: 330, y: -770, type: 'haste' }
+        ],
+        // Bonus Area
+        rift: { x: 480, y: -690, width: 40, height: 70, targetX: 4020, targetY: 340 },
+        bonusAreaBgGradient: ["#020617", "#1e1b4b"],
+        bonusPlatformColor: "#38bdf8",
+        bonusEnemies: [
+            { x: 4180, y: 368, width: 24, height: 32, minX: 4120, maxX: 4280, speed: 2.8, alive: true },
+            { x: 4180, y: 100, width: 32, height: 32, minX: 4050, maxX: 4300, speed: 3.0, type: 'flying', alive: true }
+        ],
+        bonusCrystals: [
+            { x: 4150, y: 280, width: 16, height: 20, collected: false },
+            { x: 4250, y: 10, width: 16, height: 20, collected: false },
+        ],
+        star: { x: 4180, y: -180, width: 28, height: 28, collected: false },
+        returnPortal: { x: 4220, y: -180, width: 40, height: 70, targetX: 300, targetY: -770 }
+    },
+    {
+        name: "Realm 8: The Thunder Peak Citadel",
+        isBossLevel: false,
+        isVertical: true,
+        bgGradient: ["#1a0826", "#3b0764"],
+        primaryColor: "#a855f7",
+        secondaryColor: "#7e22ce",
+        portalX: 380, portalY: -1670,
+        platforms: [
+            { x: 50, y: 400, width: 700, height: 50 },
+            { x: 180, y: 310, width: 130, height: 15 },
+            { x: 420, y: 220, width: 130, height: 15 },
+            { x: 200, y: 130, width: 130, height: 15 },
+            { x: 460, y: 40, width: 130, height: 15 },
+            { x: 260, y: -50, width: 130, height: 15 },
+            { x: 100, y: -140, width: 130, height: 15 },
+            { x: 360, y: -230, width: 130, height: 15 },
+            { x: 540, y: -320, width: 130, height: 15 },
+            { x: 300, y: -410, width: 140, height: 15 },
+            { x: 120, y: -500, width: 130, height: 15 },
+            { x: 420, y: -590, width: 130, height: 15 },
+            { x: 220, y: -680, width: 130, height: 15 },
+            { x: 480, y: -770, width: 130, height: 15 },
+            { x: 250, y: -860, width: 130, height: 15 },
+            { x: 500, y: -950, width: 130, height: 15 },
+            { x: 300, y: -1040, width: 140, height: 15 },
+            { x: 140, y: -1130, width: 130, height: 15 },
+            { x: 440, y: -1220, width: 130, height: 15 },
+            { x: 220, y: -1310, width: 130, height: 15 },
+            { x: 480, y: -1400, width: 130, height: 15 },
+            { x: 280, y: -1490, width: 140, height: 15 },
+            { x: 250, y: -1600, width: 300, height: 30 },
+            // Bonus Spire Area
+            { x: 4000, y: 400, width: 300, height: 50 },
+            { x: 4100, y: 310, width: 120, height: 15 },
+            { x: 4220, y: 220, width: 120, height: 15 },
+            { x: 4100, y: 130, width: 120, height: 15 },
+            { x: 4220, y: 40, width: 120, height: 15 },
+            { x: 4100, y: -50, width: 120, height: 15 },
+            { x: 4120, y: -130, width: 160, height: 30 },
+        ],
+        crystals: [
+            { x: 220, y: 280, width: 16, height: 20, collected: false },
+            { x: 500, y: 10, width: 16, height: 20, collected: false },
+            { x: 150, y: -530, width: 16, height: 20, collected: false },
+            { x: 470, y: -1250, width: 16, height: 20, collected: false },
+            { x: 380, y: -1560, width: 16, height: 20, collected: false }
+        ],
+        enemies: [
+            { x: 250, y: 368, width: 24, height: 32, minX: 80, maxX: 650, speed: 2.2, type: 'shadowGoblin', alive: true },
+            { x: 350, y: -60, width: 32, height: 32, minX: 100, maxX: 650, speed: 2.8, type: 'flying', alive: true },
+            { x: 260, y: -720, width: 24, height: 32, minX: 100, maxX: 600, speed: 2.5, type: 'shadowGoblin', alive: true },
+            { x: 350, y: -1250, width: 32, height: 32, minX: 150, maxX: 650, speed: 3.0, type: 'flying', alive: true }
+        ],
+        powerUps: [
+            { x: 240, y: 90, type: 'pet' },
+            { x: 320, y: -900, type: 'haste' }
+        ],
+        // Bonus Area
+        rift: { x: 510, y: -810, width: 40, height: 70, targetX: 4020, targetY: 340 },
+        bonusAreaBgGradient: ["#1a0826", "#4c1d95"],
+        bonusPlatformColor: "#c084fc",
+        bonusEnemies: [
+            { x: 4180, y: 368, width: 24, height: 32, minX: 4120, maxX: 4280, speed: 3.0, alive: true },
+            { x: 4180, y: 80, width: 32, height: 32, minX: 4050, maxX: 4300, speed: 3.2, type: 'flying', alive: true }
+        ],
+        bonusCrystals: [
+            { x: 4140, y: 280, width: 16, height: 20, collected: false },
+            { x: 4240, y: 10, width: 16, height: 20, collected: false },
+        ],
+        star: { x: 4180, y: -180, width: 28, height: 28, collected: false },
+        returnPortal: { x: 4220, y: -180, width: 40, height: 70, targetX: 300, targetY: -900 }
+    },
+    {
+        name: "Realm 9: The Starlight Zenith",
+        isBossLevel: false,
+        isVertical: true,
+        bgGradient: ["#030712", "#1e1035"],
+        primaryColor: "#e0e7ff",
+        secondaryColor: "#818cf8",
+        portalX: 380, portalY: -1870,
+        platforms: [
+            { x: 50, y: 400, width: 700, height: 50 },
+            { x: 180, y: 310, width: 120, height: 15 },
+            { x: 420, y: 220, width: 120, height: 15 },
+            { x: 200, y: 130, width: 120, height: 15 },
+            { x: 460, y: 40, width: 120, height: 15 },
+            { x: 260, y: -50, width: 120, height: 15 },
+            { x: 100, y: -140, width: 120, height: 15 },
+            { x: 360, y: -230, width: 120, height: 15 },
+            { x: 540, y: -320, width: 120, height: 15 },
+            { x: 300, y: -410, width: 130, height: 15 },
+            { x: 120, y: -500, width: 120, height: 15 },
+            { x: 420, y: -590, width: 120, height: 15 },
+            { x: 220, y: -680, width: 120, height: 15 },
+            { x: 480, y: -770, width: 120, height: 15 },
+            { x: 250, y: -860, width: 120, height: 15 },
+            { x: 500, y: -950, width: 120, height: 15 },
+            { x: 300, y: -1040, width: 130, height: 15 },
+            { x: 140, y: -1130, width: 120, height: 15 },
+            { x: 440, y: -1220, width: 120, height: 15 },
+            { x: 220, y: -1310, width: 120, height: 15 },
+            { x: 480, y: -1400, width: 120, height: 15 },
+            { x: 280, y: -1490, width: 130, height: 15 },
+            { x: 120, y: -1580, width: 120, height: 15 },
+            { x: 420, y: -1670, width: 120, height: 15 },
+            { x: 250, y: -1800, width: 300, height: 30 },
+            // Bonus Spire Area
+            { x: 4000, y: 400, width: 300, height: 50 },
+            { x: 4100, y: 310, width: 120, height: 15 },
+            { x: 4220, y: 220, width: 120, height: 15 },
+            { x: 4100, y: 130, width: 120, height: 15 },
+            { x: 4220, y: 40, width: 120, height: 15 },
+            { x: 4100, y: -50, width: 120, height: 15 },
+            { x: 4120, y: -130, width: 160, height: 30 },
+        ],
+        crystals: [
+            { x: 210, y: 280, width: 16, height: 20, collected: false },
+            { x: 490, y: 10, width: 16, height: 20, collected: false },
+            { x: 150, y: -530, width: 16, height: 20, collected: false },
+            { x: 460, y: -1250, width: 16, height: 20, collected: false },
+            { x: 380, y: -1760, width: 16, height: 20, collected: false }
+        ],
+        enemies: [
+            { x: 250, y: 368, width: 24, height: 32, minX: 80, maxX: 650, speed: 2.4, type: 'shadowGoblin', alive: true },
+            { x: 350, y: -70, width: 32, height: 32, minX: 100, maxX: 650, speed: 3.0, type: 'flying', alive: true },
+            { x: 260, y: -720, width: 24, height: 32, minX: 100, maxX: 600, speed: 2.8, type: 'shadowGoblin', alive: true },
+            { x: 350, y: -1350, width: 32, height: 32, minX: 150, maxX: 650, speed: 3.2, type: 'flying', alive: true }
+        ],
+        powerUps: [
+            { x: 240, y: 90, type: 'pet' },
+            { x: 300, y: -1080, type: 'doubleJump' }
+        ],
+        // Bonus Area
+        rift: { x: 510, y: -1000, width: 40, height: 70, targetX: 4020, targetY: 340 },
+        bonusAreaBgGradient: ["#030712", "#311042"],
+        bonusPlatformColor: "#e0e7ff",
+        bonusEnemies: [
+            { x: 4180, y: 368, width: 24, height: 32, minX: 4120, maxX: 4280, speed: 3.2, alive: true },
+            { x: 4180, y: 80, width: 32, height: 32, minX: 4050, maxX: 4300, speed: 3.5, type: 'flying', alive: true }
+        ],
+        bonusCrystals: [
+            { x: 4140, y: 280, width: 16, height: 20, collected: false },
+            { x: 4240, y: 10, width: 16, height: 20, collected: false },
+        ],
+        star: { x: 4180, y: -180, width: 28, height: 28, collected: false },
+        returnPortal: { x: 4220, y: -180, width: 40, height: 70, targetX: 300, targetY: -1080 }
+    },
+    {
+        name: "World 3 Boss: Archon the Titan Overlord",
+        isBossLevel: true,
+        bgGradient: ["#020617", "#0f172a"],
+        primaryColor: "#38bdf8",
+        secondaryColor: "#0284c7",
+        platforms: [
+            { x: 0, y: 400, width: 900, height: 50 },
+            { x: 150, y: 300, width: 180, height: 15 },
+            { x: 470, y: 300, width: 180, height: 15 },
+            { x: 310, y: 200, width: 180, height: 15 },
+            { x: 150, y: 110, width: 180, height: 15 },
+            { x: 470, y: 110, width: 180, height: 15 }
+        ],
+        crystals: [],
+        enemies: []
     }
 ];
