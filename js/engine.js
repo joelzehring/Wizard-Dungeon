@@ -528,7 +528,14 @@ class Game {
         });
 
         if (level.isVertical) {
-            if (wizard.y > this.camera.y + this.canvas.height + 80) this.handlePlayerDeath();
+            const inBonusArea = wizard.x > 3700;
+            if (inBonusArea) {
+                // In the horizontal bonus area, fall off bottom of screen
+                if (wizard.y > this.canvas.height + 100) this.handlePlayerDeath();
+            } else {
+                // In the vertical main area, fall off the current camera viewport bottom
+                if (wizard.y > this.camera.y + this.canvas.height + 80) this.handlePlayerDeath();
+            }
         } else {
             if (wizard.y > this.canvas.height + 100) this.handlePlayerDeath();
         }
@@ -574,9 +581,17 @@ class Game {
         this.processInteractions();
 
         if (this.activeLevel && this.activeLevel.isVertical) {
-            this.camera.x = 0;
-            const targetY = this.player.y - this.canvas.height / 2 + this.player.height / 2;
-            this.camera.y = Math.min(0, targetY);
+            const inBonusArea = this.player.x > 3700;
+            if (inBonusArea) {
+                // Bonus area uses horizontal scrolling like a normal level
+                this.camera.y = 0;
+                this.camera.x = this.player.x - this.canvas.width / 2 + this.player.width / 2;
+                if (this.camera.x < 3700) this.camera.x = 3700;
+            } else {
+                this.camera.x = 0;
+                const targetCamY = this.player.y - this.canvas.height / 2 + this.player.height / 2;
+                this.camera.y = Math.min(0, targetCamY);
+            }
         } else {
             this.camera.y = 0;
             this.camera.x = this.player.x - this.canvas.width / 2 + this.player.width / 2;
