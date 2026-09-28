@@ -5,6 +5,7 @@ export class Level {
     constructor(data) {
         this.name = data.name;
         this.isBossLevel = data.isBossLevel;
+        this.isVertical = data.isVertical || false;
         this.bgGradient = data.bgGradient;
         this.primaryColor = data.primaryColor;
         this.secondaryColor = data.secondaryColor;
@@ -21,7 +22,15 @@ export class Level {
 
         if (this.isBossLevel) {
             const isFinalBoss = data.name && (data.name.includes("Gorgon") || data.name.includes("World 2"));
-            this.boss = new Boss({ x: 750, y: 220, maxHp: isFinalBoss ? 15 : 10, isFinal: isFinalBoss });
+            const isTitanBoss = data.name && (data.name.includes("Archon") || data.name.includes("World 3") || data.name.includes("Titan"));
+            const maxHp = isTitanBoss ? 20 : (isFinalBoss ? 15 : 10);
+            this.boss = new Boss({
+                x: isTitanBoss ? 368 : 750,
+                y: isTitanBoss ? 180 : 220,
+                maxHp: maxHp,
+                isFinal: isFinalBoss,
+                isTitan: isTitanBoss
+            });
         } else {
             this.boss = null;
         }
@@ -40,9 +49,12 @@ export class Level {
         this.returnPortal = data.returnPortal ? { ...data.returnPortal } : null;
     }
 
-    drawEnvironment(ctx, canvas, cameraX, score) {
+    drawEnvironment(ctx, canvas, camera, score) {
+        const camX = typeof camera === 'object' ? camera.x : camera;
+        const camY = typeof camera === 'object' ? (camera.y || 0) : 0;
+
         // Determine if camera is in the bonus area (X >= 3800)
-        const inBonusArea = cameraX > 3700;
+        const inBonusArea = camX > 3700;
 
         // Background gradient - blend between main and bonus when transitioning
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -57,12 +69,20 @@ export class Level {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.save();
-        ctx.translate(-cameraX, 0);
+        ctx.translate(-camX, -camY);
 
         // Starfield / Particles
         ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
-        for (let i = 0; i < 30; i++) {
-            ctx.fillRect((i * 135) % 2500, 40 + (i % 4) * 50, 2, 2);
+        if (this.isVertical) {
+            for (let i = 0; i < 50; i++) {
+                const sx = (i * 137) % canvas.width;
+                const sy = -2200 + (i * 97) % 2800;
+                ctx.fillRect(sx, sy, 2, 2);
+            }
+        } else {
+            for (let i = 0; i < 30; i++) {
+                ctx.fillRect((i * 135) % 2500, 40 + (i % 4) * 50, 2, 2);
+            }
         }
         // Bonus area stars
         if (!this.isBossLevel) {
